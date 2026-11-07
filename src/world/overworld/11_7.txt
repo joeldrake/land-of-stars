@@ -1,0 +1,12 @@
+// Overworld 11,7 - meadow
+TBTT...TBBTTTBBB
+BB............TB
+TB.......bTT....
+BB..............
+TT..........T.TT
+..............BB
+..B...F..F....BB
+..............TB
+BT..T.....T...TB
+TT............BT
+BTBBBTBBBTBTTBTT

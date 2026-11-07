@@ -1,0 +1,12 @@
+// Overworld 3,2 - mountains
+MMMMM,,,MMMMMMMM
+MM,,,,,,,,,,,,,M
+MM,,,,,,M,R,,M,M
+MM,,,,,,,g,,,,,M
+MM,R,b,,b,R,,,,M
+MM,R,,g,,,,,,,,M
+MM,,RR,,,,,,,,,M
+MM,,,,,,,,,,,,,,
+MM,RR,,,,,,,,,,,
+MM,,,,,,,,,,,,,M
+MMMMMMMMMMMMMMMM

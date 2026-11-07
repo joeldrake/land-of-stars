@@ -1,0 +1,12 @@
+// Overworld 3,3 - meadow
+BTBTBBBBBBBBTTBT
+BT.............B
+BT.........F...T
+TB.b............
+BT..............
+TT..............
+BB......F......T
+.........F.....T
+...............T
+BB..TTBTTBTTTBTT
+TT..TBTTTTTTTTBB

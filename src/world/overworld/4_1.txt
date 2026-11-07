@@ -1,0 +1,12 @@
+// Overworld 4,1 - sand
+RRMRMRMM,,,,MRMR
+RMRMMMMM,,,,MRMM
+RM,R,,,,,,,,,,MM
+RM,,,,,,,,,,,,RR
+MM,RR,,,gs,,,,RM
+RM,,,,,,,,,,,,,,
+MR,,,,,,,,,,R,,,
+RR,,RR,,,,,,,,RM
+MM,,,,,,,,,RR,RM
+RR,,,,,,,,,,,,MM
+MRRR,,RMMRRMMMRR

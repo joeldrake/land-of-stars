@@ -1,0 +1,12 @@
+// Overworld 11,1 - mountains
+MMMMMMMMM,,,,MMM
+M,,,,,,,,,,,,,MM
+M,,RR,,,,,,,,,MM
+M,,,,,,,,,,,,,MM
+M,,b,,R,,,,RRMMM
+M,,,,,,,,,R,MMMM
+M,R,M,,,,,b,,,,,
+M,,,,,,,,,,,,R,,
+M,,,,,,MM,,,,,MM
+M,,,,,,,,,,,,,MM
+MMMM,,,,MMMMMMMM

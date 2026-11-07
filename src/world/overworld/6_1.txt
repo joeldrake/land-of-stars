@@ -1,0 +1,12 @@
+// Overworld 6,1 - sand
+RR,,,,MMMMMRRRRR
+MR,,,,MMMRRMMMMM
+,,,,,,,,R,,,,,MM
+,,,,,RR,,,,,,,MM
+RM,,,,,,,,,,,,RR
+RR,,,,,,,,,,,,RM
+MR,g,,,,,,,,,,,,
+RRRR,,,,,,,,,,,,
+RM,,,,,,,,,,,,,,
+RMMRRRMMMM,,RRRM
+RRRRRRMRMM,,RMMR

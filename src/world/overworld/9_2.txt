@@ -1,0 +1,12 @@
+// Overworld 9,2 - meadow
+TTTBTTTTBTB...TT
+BB.............T
+BB...g.........T
+BT.....TT.b....T
+BB..........F..T
+TB...FF........B
+........F.......
+................
+BT.F............
+TB.............B
+TBBBBTBTBBT...BB

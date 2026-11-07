@@ -1,0 +1,12 @@
+// Overworld 8,2 - mountains
+MMMMMMMM,,,MMMMM
+MM,,,,,,,,,,,,,M
+MM,,,,,,,,,R,,,M
+MM,,,,,,,,,MM,,M
+MM,,,,,,R,,,,,,M
+MM,,,,,b,,,,RR,M
+,,R,,,MRR,,,,,,,
+,,,RR,,,,,g,,,,,
+,,,,,,,,R,,,,,,M
+MMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMM

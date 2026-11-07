@@ -1,0 +1,12 @@
+// Overworld 5,0 - mountains
+MMMMMMMMMMMMMMMM
+M,,,,,,,,,,,,,,M
+M,,,,,,,,,,RR,,M
+M,,,,,,,,MM,b,,M
+M,,,,R,,,,R,,,,M
+,,,,,,,,,,,,,R,,
+,,,R,,,g,,,,,,,,
+,,,,,,,,,,,RM,,,
+M,,,,,,RR,,,,,,M
+MMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMM

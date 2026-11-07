@@ -1,0 +1,9 @@
+{
+  "window.title": "${dirty}Adventure-time${separator} ${activeEditorMedium}",
+  "workbench.colorCustomizations": {
+    "titleBar.activeForeground": "#fff",
+    "titleBar.inactiveForeground": "#fff",
+    "titleBar.activeBackground": "#007700",
+    "titleBar.inactiveBackground": "#007700"
+  }
+}

@@ -1,0 +1,12 @@
+// Overworld 9,0 - mountains
+MMMMMMMMMMMMMMMM
+M,,,,,,,,,,,,,MM
+,,,,,,,,MM,,g,MM
+,,,,R,,,gRRRR,MM
+,,,,,,,MM,,,R,,,
+M,,,,RR,,,MM,,,,
+M,,,,,,,,,,,,,MM
+M,,,,,,g,,,,,,MM
+M,,MM,,,,,,MM,MM
+MMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMM

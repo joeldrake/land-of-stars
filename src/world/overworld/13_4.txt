@@ -1,0 +1,13 @@
+// Overworld 13,4 - lake
+@door 7,3 -> d1:2:3 7,9
+WWWWWWWWWWW...WW
+WW..CCCCCCC...WW
+....CCCCCCC...WW
+....CCCDCCC...WW
+................
+WW...FW.........
+WW...WWW........
+WW....W.......WW
+WW............WW
+WW............WW
+WW..WWWWWWWWWWWW

@@ -1,0 +1,12 @@
+// Overworld 4,6 - plains
+TT....TTTTTTTTTT
+TT....TTTTTTTTTT
+TT..BBF.BT....TT
+................
+....BB..........
+................
+TT............TT
+TT..........F.TT
+TT....g.......TT
+TTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTT

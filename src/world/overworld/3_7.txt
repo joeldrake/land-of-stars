@@ -1,0 +1,12 @@
+// Overworld 3,7 - forest
+TTTTTTTT..TTTTTT
+TTTTTTTT..TTTTTT
+T.T...TT....s..T
+..TT............
+....TTs......T..
+.....TT......T.T
+T..BB...T.T....T
+T...........TT.T
+T.......T......T
+TTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTT

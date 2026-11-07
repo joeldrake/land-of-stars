@@ -1,0 +1,12 @@
+// Overworld 15,0 - mountains
+MMMMMMMMMMMMMMMM
+MM,,,,,,,,,,,,MM
+MMRR,,,,,RR,R,MM
+MM,,gb,,,,,,,RMM
+MM,,,,,,,,,,,,MM
+,,,,,M,,,,,,RMMM
+,,M,,,,RRR,,,,MM
+,,,,,,g,R,,,,,MM
+MM,,,,,,,,,R,,MM
+MM,,,,,,,,,,,,MM
+MMMMMMMMMM,,MMMM

@@ -1,0 +1,12 @@
+// Overworld 7,1 - mountains
+MMMMMMMMMMMMMMMM
+M,,,,,,,,,,,,,MM
+M,,,R,b,,,,,,,MM
+M,,,,,,,,,,,,,MM
+M,,,,,,,,R,,,,MM
+M,,,,,,,,,,,,RMM
+,,,,,,,,,,,,,RMM
+,,,,,R,,,,,,,,MM
+,,,,,M,g,,,,,,MM
+M,,,,,,,,,,,,,MM
+MMMM,,MMMMMMMMMM

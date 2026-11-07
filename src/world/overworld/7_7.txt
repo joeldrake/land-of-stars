@@ -1,0 +1,13 @@
+// Overworld 7,7 - plains
+@door 11,2 -> cave:sword 7,9
+TTTTT....TTTTTTT
+TTTTT....TMMMTTT
+T.........MDM..T
+T...F..........T
+T..............T
+..FF............
+................
+...........B....
+T..........F...T
+TTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTT

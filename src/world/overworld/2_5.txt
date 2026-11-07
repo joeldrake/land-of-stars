@@ -1,0 +1,12 @@
+// Overworld 2,5 - graveyard
+TTTTTTTT...TTTTT
+TT.............T
+...............T
+.....G...G.GG..T
+.....b.........T
+TT.G.G.....G...T
+TT......kb.....T
+TT.....G...G...T
+TT.............T
+TT.............T
+TTTTTTTTT...TTTT

@@ -1,0 +1,12 @@
+// Overworld 14,3 - lake
+WWWWWWWWWW...WWW
+WWWWWWWWWW...WWW
+WW....FF.....F.W
+WW.....s.......W
+WW....s........W
+WW.........WWW.W
+WW.....F.......W
+...............W
+.......F.....F.W
+WW.............W
+WWWWWWWWWWW..WWW

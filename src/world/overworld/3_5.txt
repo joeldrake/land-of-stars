@@ -1,0 +1,12 @@
+// Overworld 3,5 - meadow
+TBTBBBTBT....TTT
+B.............TB
+T....s....B..BBT
+B.............TT
+T...........TF..
+B...............
+B......bs.....BB
+B......B......TB
+T....F........BB
+T.............BT
+TTBBBBTTTT...TBT

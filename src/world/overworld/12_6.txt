@@ -1,0 +1,12 @@
+// Overworld 12,6 - meadow
+BBBBBTBTBTTTTTBT
+TTBBTTTTTTTBTBBT
+TB............BT
+BT.g.......g..BT
+...F..........TT
+..B.........B...
+TB..............
+BB...........FBB
+BB........F...TT
+TBBT...TBTBBBTBB
+BBTB...BTBBTTTTT

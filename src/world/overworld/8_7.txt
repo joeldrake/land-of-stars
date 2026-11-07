@@ -1,0 +1,12 @@
+// Overworld 8,7 - plains
+TTTTTTT....TTTTT
+TTTTTTT....TTTTT
+TT.............T
+TT....s........T
+TT.............T
+............T...
+................
+..FF............
+TT..FF..F......T
+TT.............T
+TTTTTTTTTTTTTTTT

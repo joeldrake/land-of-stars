@@ -1,0 +1,12 @@
+// Overworld 4,3 - meadow
+TBBBBB...BTBTTBT
+TTTTTB...TTBBTBB
+T...FF....TFT..B
+.....BF........T
+...............B
+.........s.....B
+B.....BB.......B
+T...............
+T..Bb...........
+TTTBBBBBTBTTBTTB
+TBTTBBTTBTBBTBTT

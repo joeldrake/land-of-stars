@@ -1,0 +1,12 @@
+// Overworld 0,2 - forest
+TTTTTTTT...TTTTT
+T..............T
+T..............T
+T.T............T
+T..........T...T
+T........B.....T
+T..T........TT..
+T.......TT..T...
+T.TT.....b.TT...
+TTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTT
