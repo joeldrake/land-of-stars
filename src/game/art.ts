@@ -3,11 +3,11 @@
  * tiles from a few drawing primitives. No image files needed.
  */
 import { TILE } from '../config';
+import { P_DOWN, PLAYER_PAL, STAR, STAR_PAL, sym, type Pal } from './sprites';
 import type { Dir } from './types';
 import type { AreaKind } from './world';
 
 type Img = HTMLCanvasElement;
-type Pal = Record<string, string>;
 
 function canvas(w: number, h: number): Img {
   const c = document.createElement('canvas');
@@ -27,11 +27,6 @@ function sprite(rows: string[], pal: Pal): Img {
   return c;
 }
 
-/** Mirror 8-wide half rows into 16-wide symmetric rows. */
-const sym = (half: string[]) => half.map(r => {
-  const l = r.padEnd(8, '.').slice(0, 8);
-  return l + [...l].reverse().join('');
-});
 const withRows = (rows: string[], over: Record<number, string>) => rows.map((r, i) => over[i] ?? r);
 
 function flipH(src: Img): Img {
@@ -44,14 +39,6 @@ function flipH(src: Img): Img {
 }
 
 // ---------------------------------------------------------------- player
-const PLAYER_PAL: Pal = {
-  o: '#2b1810', h: '#a0522d', H: '#d08850', k: '#f5c9a0', e: '#2b1810', r: '#e0606e',
-  d: '#e84a8a', D: '#b02e64', s: '#5a3418', y: '#ffd34d',
-};
-const P_DOWN = sym([
-  '......oo', '....oohh', '...ohHhh', '..ohhhhh', 'oohhhhhh', 'ohhohkkk', 'ohhokekk', '.oookkkk',
-  '....okkr', '...odddd', '..okdddd', '..okdDdd', '...odddd', '..oddddd', '....oko.', '....sss.',
-]);
 const P_UP = sym([
   '......oo', '....oohh', '...ohhhh', '..ohhHhh', 'oohhhhhh', 'ohhohhhh', 'ohhohhhh', '.ooohhhh',
   '....oohh', '...odddd', '..okdddd', '..okdDdd', '...odddd', '..oddddd', '....oko.', '....sss.',
@@ -209,10 +196,6 @@ const SHIELD = [
   'ooooooooo', 'obbbybbbo', 'obbbybbbo', 'obyyyyybo', 'obbbybbbo', 'obbbybbbo', '.obbybbo.', '..obbbo..', '...ooo...',
 ];
 const SHIELD_SMALL = ['ooooo', 'obybo', 'oyyyo', 'obybo', '.obo.', '..o..'];
-const STAR = [
-  '.....y.....', '....yyy....', '....yYy....', 'yyyyyYyyyyy', '.yyyYYYyyy.', '..yyyYyyy..',
-  '...yyyyy...', '...yy.yy...', '..yy...yy..', '..y.....y..', '.y.......y.',
-];
 
 
 const FLAG_A = ['oyrrrrr.', 'orrryrr.', 'orryyyr.', 'orrryrr.', 'orrrrr..', 'o.......', 'o.......', 'o.......', 'o.......', 'o.......'];
@@ -292,7 +275,7 @@ function buildArt() {
       K: sprite(KEY, { y: '#ffd34d' }),
       '1': sprite(SWORD, { w: '#e8f0ff', W: '#a0b0d0', y: '#ffd34d', b: '#7a4a20' }),
       '2': sprite(STAFF, { y: '#ffe066', p: '#ff7af0', b: '#8a5a2a' }),
-      '*': sprite(STAR, { y: '#ffe14d', Y: '#fffbe0' }),
+      '*': sprite(STAR, STAR_PAL),
       '3': sprite(BOMB, { o: '#3a4a8a', W: '#c8d4ff', y: '#ffb030' }),
       '0': sprite(BOMB, { o: '#3a4a8a', W: '#c8d4ff', y: '#ffb030' }),
       '4': sprite(BOOMERANG, { o: '#5a2a00', y: '#ff9a2a', Y: '#ffe0a0' }),

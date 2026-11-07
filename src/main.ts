@@ -11,6 +11,15 @@ import { loadSettings, SaveManager, storeSettings } from './storage';
 import { Dialog } from './ui/dialog';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+// Started from the home screen: show the star splash a moment, then fade it out.
+// (CSS shows it for display-mode standalone/fullscreen; older iOS only has navigator.standalone.)
+if ((navigator as Navigator & { standalone?: boolean }).standalone) document.body.classList.add('standalone');
+setTimeout(() => {
+  const splash = $('splash');
+  splash.classList.add('gone');
+  setTimeout(() => splash.remove(), 600);
+}, 1100);
 const canvas = $<HTMLCanvasElement>('screen');
 const frame = $('frame');
 const overlay = $('overlay');

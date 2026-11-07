@@ -10,12 +10,14 @@ npm run dev        # Vite med --host (går att testa på iPad/mobil i samma nät
 npm test           # vitest: validerar alla världsfiler (måste vara grönt)
 npm run typecheck
 npm run build
+npm run icons      # ritar om app-ikoner, favicon och splash-bilder
 ```
 
 ## Stack och arkitektur
 
 - Vanilla TypeScript, Vite och en `<canvas>`. Inget ramverk.
 - **All grafik ritas i kod** i `src/game/art.ts`: pixel-sprites som ASCII-kartor och rutor med enkla primitiver. Inga bildfiler.
+- Undantag: app-ikoner, favicon och iPhone-splash (`public/*.png`, `public/splash/`) genereras av `npm run icons` (`scripts/generate-icons.mjs`) från samma pixeldata (`src/game/sprites.ts`). Redigera inte PNG-filerna för hand, och kör skriptet igen om hjältinnan eller stjärnan ändras.
 - Intern upplösning är 256×224 (16×11 rutor à 16 px plus 48 px HUD), ritad med `RENDER_SCALE` 3 så att den blir skarp. CSS skalar sedan bilden.
 - `src/game/game.ts` innehåller spellogik och rendering. `world.ts` läser världsfilerna via `import.meta.glob`. Övriga filer: `input.ts` (tangentbord och touch), `hud.ts`, `save.ts`, `sfx.ts` (ljudeffekter med Web Audio, inga ljudfiler).
 - `src/main.ts` sköter menyer och inställningar som HTML-overlay. `src/ui/dialog.ts` är textrutan.

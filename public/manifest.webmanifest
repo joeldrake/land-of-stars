@@ -1,10 +1,35 @@
 {
   "name": "Stjärnornas land",
-  "short_name": "Stjärnor",
+  "short_name": "Stjärnornas land",
   "start_url": "./",
   "display": "fullscreen",
   "orientation": "any",
   "background_color": "#0d0d14",
   "theme_color": "#0d0d14",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }

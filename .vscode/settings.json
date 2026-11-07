@@ -1,9 +1,146 @@
 {
-  "window.title": "${dirty}Land of Stars ${separator} ${activeEditorMedium}",
+  // Stjärnornas land: färgerna kommer från spelet (style.css, art.ts, hud.ts).
+  //   natt #0d0d14 · panel #1b1b2a · kant #50507a · guld #ffd34d · gräs #74c44f
+  //   skog #2f7d32 · vatten #3d7fe0 · A-röd #c8323c · B-blå #3459c0 · klänning #e84a8a · magi #7cff5a
+  "window.title": "${dirty}⭐ Stjärnornas land ${separator} ${activeEditorMedium}",
+
   "workbench.colorCustomizations": {
-    "titleBar.activeForeground": "#fff",
-    "titleBar.inactiveForeground": "#fff",
-    "titleBar.activeBackground": "#007700",
-    "titleBar.inactiveBackground": "#007700"
+    // Titelrad: skogen med guldtext, som spelets rubrik
+    "titleBar.activeBackground": "#2f7d32",
+    "titleBar.activeForeground": "#ffd34d",
+    "titleBar.inactiveBackground": "#1b4d1e",
+    "titleBar.inactiveForeground": "#c8e6b0",
+    "titleBar.border": "#1b4d1e",
+
+    // Aktivitetsfält: natt med guldikoner och rosa märken
+    "activityBar.background": "#0d0d14",
+    "activityBar.foreground": "#ffd34d",
+    "activityBar.inactiveForeground": "#50507a",
+    "activityBar.activeBorder": "#ffd34d",
+    "activityBar.border": "#1b1b2a",
+    "activityBarBadge.background": "#e84a8a",
+    "activityBarBadge.foreground": "#ffffff",
+
+    // Sidopanel och flikar: spelets menypaneler
+    "sideBar.background": "#13131e",
+    "sideBar.foreground": "#d8d8e8",
+    "sideBar.border": "#1b1b2a",
+    "sideBarTitle.foreground": "#ffd34d",
+    "sideBarSectionHeader.background": "#1b1b2a",
+    "sideBarSectionHeader.foreground": "#ffd34d",
+    "list.activeSelectionBackground": "#3a3420",
+    "list.activeSelectionForeground": "#ffd34d",
+    "list.inactiveSelectionBackground": "#2a2a3a",
+    "list.hoverBackground": "#1b1b2a",
+    "list.highlightForeground": "#ffd34d",
+    "editorGroupHeader.tabsBackground": "#0d0d14",
+    "tab.activeBackground": "#1b1b2a",
+    "tab.activeForeground": "#ffd34d",
+    "tab.activeBorderTop": "#ffd34d",
+    "tab.inactiveBackground": "#0d0d14",
+    "tab.inactiveForeground": "#8a8aa8",
+    "tab.border": "#0d0d14",
+
+    // Editorn: natthimmel, guldmarkör, stjärnljus
+    "editor.background": "#0d0d14",
+    "editor.foreground": "#f0f0f8",
+    "editorCursor.foreground": "#ffd34d",
+    "editor.lineHighlightBackground": "#1b1b2a",
+    "editor.selectionBackground": "#3459c088",
+    "editor.wordHighlightBackground": "#3a3a5088",
+    "editor.findMatchBackground": "#ffd34d66",
+    "editor.findMatchHighlightBackground": "#ffd34d33",
+    "editorLineNumber.foreground": "#3a3a50",
+    "editorLineNumber.activeForeground": "#ffd34d",
+    "editorIndentGuide.background1": "#1b1b2a",
+    "editorIndentGuide.activeBackground1": "#50507a",
+    "editorRuler.foreground": "#74c44f55",
+    "editorBracketMatch.background": "#3459c055",
+    "editorBracketMatch.border": "#ffd34d",
+    "editorWhitespace.foreground": "#2a2a3a",
+    "editorGutter.addedBackground": "#74c44f",
+    "editorGutter.modifiedBackground": "#3d7fe0",
+    "editorGutter.deletedBackground": "#c8323c",
+    "editorError.foreground": "#e84a4a",
+    "editorWarning.foreground": "#ffd34d",
+    "scrollbarSlider.background": "#3a3a5066",
+    "scrollbarSlider.hoverBackground": "#50507a99",
+
+    // Terminal och paneler
+    "panel.background": "#0d0d14",
+    "panel.border": "#1b1b2a",
+    "panelTitle.activeForeground": "#ffd34d",
+    "panelTitle.activeBorder": "#ffd34d",
+    "terminal.background": "#0d0d14",
+    "terminal.foreground": "#f0f0f8",
+    "terminalCursor.foreground": "#ffd34d",
+    "terminal.ansiRed": "#e84a4a",
+    "terminal.ansiGreen": "#74c44f",
+    "terminal.ansiYellow": "#ffd34d",
+    "terminal.ansiBlue": "#3d7fe0",
+    "terminal.ansiMagenta": "#e84a8a",
+    "terminal.ansiCyan": "#7ac0ff",
+    "terminal.ansiBrightGreen": "#7cff5a",
+    "terminal.ansiBrightYellow": "#ffe14d",
+
+    // Statusrad: vattnet, med guldtext. Röd när man felsöker (som A-knappen).
+    "statusBar.background": "#3459c0",
+    "statusBar.foreground": "#ffffff",
+    "statusBar.border": "#2a4590",
+    "statusBar.debuggingBackground": "#c8323c",
+    "statusBar.noFolderBackground": "#0d0d14",
+    "statusBarItem.remoteBackground": "#ffd34d",
+    "statusBarItem.remoteForeground": "#2a1a10",
+    "statusBarItem.hoverBackground": "#4a6ad0",
+
+    // Knappar och fält: som knapparna i spelets menyer
+    "button.background": "#ffd34d",
+    "button.foreground": "#2a1a10",
+    "button.hoverBackground": "#ffe080",
+    "button.secondaryBackground": "#1b1b2a",
+    "button.secondaryForeground": "#ffffff",
+    "input.background": "#0d0d14",
+    "input.border": "#50507a",
+    "inputOption.activeBorder": "#ffd34d",
+    "focusBorder": "#ffd34d",
+    "badge.background": "#e84a8a",
+    "badge.foreground": "#ffffff",
+    "progressBar.background": "#7cff5a",
+    "textLink.foreground": "#7ac0ff",
+
+    // Git-färger i filträdet
+    "gitDecoration.addedResourceForeground": "#7cff5a",
+    "gitDecoration.untrackedResourceForeground": "#74c44f",
+    "gitDecoration.modifiedResourceForeground": "#ffd34d",
+    "gitDecoration.deletedResourceForeground": "#e84a4a",
+    "gitDecoration.ignoredResourceForeground": "#50507a"
+  },
+
+  // Syntaxfärger i spelets palett
+  "editor.tokenColorCustomizations": {
+    "comments": "#7a7aa0",
+    "strings": "#93d96a",
+    "numbers": "#ffd34d",
+    "keywords": "#e84a8a",
+    "functions": "#7ac0ff",
+    "types": "#ffe080",
+    "variables": "#f0f0f8"
+  },
+
+  // Retrokänsla: blockmarkör
+  "editor.cursorStyle": "block",
+  "editor.cursorBlinking": "phase",
+  "terminal.integrated.cursorStyle": "block",
+
+  // Världsfilerna är 16 tecken breda: en linje vid 16 visar var skärmen slutar.
+  "[plaintext]": {
+    "editor.rulers": [16],
+    "editor.wordWrap": "off",
+    "editor.renderWhitespace": "all",
+    "editor.fontLigatures": false
+  },
+
+  "files.exclude": {
+    "dist": true
   }
 }

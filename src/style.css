@@ -18,6 +18,17 @@ body {
 button { font-family: inherit; cursor: pointer; touch-action: manipulation; }
 [hidden] { display: none !important; }
 
+/* Star splash: only when the game is started from the home screen. */
+#splash {
+  display: none; position: fixed; inset: 0; z-index: 50; background: #0d0d14;
+  align-items: center; justify-content: center; transition: opacity .5s;
+}
+#splash svg { width: min(32vw, 32vh); height: auto; image-rendering: pixelated; animation: splash-twinkle 1.2s ease-in-out infinite alternate; }
+@media (display-mode: standalone), (display-mode: fullscreen) { #splash { display: flex; } }
+body.standalone #splash { display: flex; }
+#splash.gone { opacity: 0; pointer-events: none; }
+@keyframes splash-twinkle { from { transform: scale(.94); } to { transform: scale(1.04); } }
+
 #app {
   position: fixed; inset: 0;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
