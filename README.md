@@ -5,6 +5,8 @@ Texterna är korta och visas med stora bokstäver så att ett barn kan öva på 
 
 Spelas på dator (tangentbord), mobil och iPad (styrkors + A/B på skärmen).
 
+**Spela här:** https://land-of-stars.joeldrak3.workers.dev
+
 ## Kom igång
 
 ```sh
