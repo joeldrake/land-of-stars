@@ -5,9 +5,17 @@ Texterna är korta och visas med stora bokstäver så att ett barn kan öva på 
 
 Spelas på dator (tangentbord), mobil och iPad (styrkors + A/B på skärmen).
 
+## Spela
+
 **Spela här:** https://land-of-stars.joeldrak3.workers.dev
 
-## Kom igång
+Tangenter: pilar/WASD = gå, mellanslag/J/Z = svärd (A), X/K = magi (B), Esc = meny.
+
+På iPad/iPhone: dela → "Lägg till på hemskärmen" ger helskärm.
+
+Utan inlogging sparas spelet bara i webbläsaren. Logga in under Inställningar för att spela på fler enheter. Den nyaste sparningen vinner.
+
+## Utveckling
 
 ```sh
 npm install
@@ -16,23 +24,7 @@ npm test           # kontrollerar att alla världsfiler hänger ihop
 npm run build      # statiska filer i dist/ – går att lägga på valfritt webbhotell
 ```
 
-Tangenter: pilar/WASD = gå, mellanslag/J/Z = svärd (A), X/K = magi (B), Esc = meny.
 
-På iPad/iPhone: dela → "Lägg till på hemskärmen" ger helskärm.
-
-## Spara på flera enheter (Supabase)
-
-Utan inställning sparas spelet bara i webbläsaren. För att fortsätta på en annan enhet:
-
-1. Skapa ett projekt på supabase.com.
-2. Kör `supabase/migrations/0001_saves.sql` i SQL-editorn.
-3. Kopiera `.env.example` till `.env` och fyll i URL och publishable key (Project Settings → API).
-4. **Authentication → Email Templates → Magic Link**: lägg till `{{ .Token }}` i mejlet, så får man en
-   6-siffrig kod (fungerar bättre på iPad än en länk). Länken fungerar också.
-5. **Authentication → URL Configuration**: lägg till adressen där spelet ligger som Redirect URL.
-
-Logga in under Inställningar. Den nyaste sparningen vinner; databasen vägrar skriva över en nyare
-sparning med en äldre.
 
 ## Struktur
 

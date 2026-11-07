@@ -7,7 +7,15 @@ export type AreaKind = 'ow' | 'cave' | 'dungeon';
 export interface Spawn { ch: string; tx: number; ty: number }
 export interface Door { tx: number; ty: number; to: string; ax: number; ay: number }
 export interface Exit { dir: Dir; to: string; ax: number; ay: number }
-export interface Npc { tx: number; ty: number; kind: string; text: string; after?: string }
+/**
+ * `after` is said once everything in the room has been picked up.
+ * `alt` is said instead when the player owns `alt.item` (e.g. `bombs=digger_bombs`).
+ */
+export interface Npc {
+  tx: number; ty: number; kind: string; text: string; after?: string; alt?: { item: string; text: string };
+  /** Only there once this castle's star has been won (`star:d1`). */
+  star?: string;
+}
 
 export interface RoomDef {
   loc: string;
@@ -62,7 +70,12 @@ export function parseRoom(loc: string, src: string): RoomDef {
         def.exits.push({ dir: m[1] as Dir, to: m[3], ax, ay });
       } else if (m[0] === 'npc') {
         const [tx, ty] = xy(m[1]);
-        def.npcs.push({ tx, ty, kind: m[2], text: m[3], after: m[4] });
+        const rest = m.slice(4);
+        const altTok = rest.find(x => x.includes('='));
+        const starTok = rest.find(x => x.startsWith('star:'));
+        const after = rest.find(x => !x.includes('=') && !x.startsWith('star:'));
+        const alt = altTok ? { item: altTok.split('=')[0], text: altTok.split('=')[1] } : undefined;
+        def.npcs.push({ tx, ty, kind: m[2], text: m[3], after, alt, star: starTok?.slice(5) });
       } else if (m[0] === 'reward') {
         const [tx, ty] = xy(m[2]);
         def.rewards.push({ ch: m[1], tx, ty });

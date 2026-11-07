@@ -1,10 +1,13 @@
-// Overworld 2,4 - graveyard
+// Overworld 2,4 - graveyard. The cracked gravestone hides the stairs to Spökborgen.
+@door 5,3 -> cave:house-digger 7,9
+@door 12,3 -> d3:1:3 7,9
+@npc 10,4 ghosty castle_d3 star:d3
 TTTTTTTTT....TTT
 TTTTTTTTT....TTT
+TT.AAAA.......TT
+TT.AAOA....GZ.TT
 TT............TT
-TT.G.......GG.TT
-TT..........k.TT
-TT.G.G...G....TT
+TT.G.G...G..k.TT
 ..............TT
 ...G.G.G.G..G.TT
 ..............TT

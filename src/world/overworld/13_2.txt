@@ -1,12 +1,14 @@
-// Overworld 13,2 - lake
+// Overworld 13,2 - lake: Vattenborgen. Shoot magic at the crystal to make the bridge.
+@door 7,3 -> d2:1:3 7,9
+@npc 9,4 crabby castle_d2 star:d2
 WWWWWWWWWWWWWWWW
-WWWWWWWWWWWWWWWW
-WW......WWWWW.WW
-...WWWWWWWWWW.WW
-..FWWWWWWWWWW.WW
-...WWWW.s.......
-WW.s............
-WW...s........WW
-WW............WW
-WW............WW
+WWWWWCCCCCCWWWWW
+WWWWWCCCCCCWWWWW
+WWWWWCCDCCCWWWWW
+WWWW.........WWW
+WWWW.......Q.WWW
+WWWWWWW_WWWWWWWW
+WWWWWWW_WWWWWWWW
+WW..............
+W..F......F.....
 WWWWWWW...WWWWWW

@@ -24,7 +24,9 @@ npm run build
 ## Världen
 
 - En textfil per skärm, 16 tecken × 11 rader. Teckenförklaring och metarader (`@door`, `@exit`, `@npc`, `@reward`) finns i `src/world/README.md`.
-- Överjorden ligger i `src/world/overworld/<x>_<y>.txt` (16×8, start `7_7`). Grottor ligger i `src/world/caves/` och borgar i `src/world/dungeons/<id>/<x>_<y>.txt`.
+- Överjorden ligger i `src/world/overworld/<x>_<y>.txt` (16×8, start `7_7`). Grottor och hus ligger i `src/world/caves/` och borgar i `src/world/dungeons/<id>/<x>_<y>.txt`.
+- Ordningen i spelet: svärd (`7_7`) → Borg 1 `d1` (`13_4`, trollstav) → Vattenborgen `d2` (ön på `13_2`, skjut magi på kristallen, bomber) → Spökborgen `d3` (spräng gravstenen med spricka på `2_4`, bumerang) → hämta stjärnnyckeln i dammen på `7_1` med bumerangen → Stjärnborgen `d4` (Stjärnslukaren, stjärnvingar).
+- Tips finns hos fiskaren (`12_3`), dödgrävaren (`2_4`) och stjärnkikaren (`7_2`). Kartan ligger i tipsgrottan (`5_6`). En knuffbar gravsten på `1_5` döljer ett hemligt rum. En spricka i bergväggen på `9_1` (spräng den) leder till skölden, som studsar tillbaka skott framifrån. Skölden behövs mot Stjärnslukaren: bara hans stjärnklot, studsat tillbaka, skadar honom. Stjärnkikaren och en skylt före bossen tipsar om det. Efter slutet: den hemliga ön på `15_7` går bara att nå med vingarna. Där bor Stjärnfén, som ger Stjärnkronan (syns på hjältinnan).
 - Överjorden skapades **en gång** av `scripts/generate-overworld.mjs`. Txt-filerna är nu källan och redigeras för hand. Kör **inte** generatorn igen (`--force` skriver över handredigeringar) utan att fråga.
 - Öppna kanter måste matcha grannskärmen, och dörrar och utgångar måste landa på gångbara rutor. `npm test` kontrollerar detta.
 - Kartan, figurerna och grafiken är **egna**. Skalan och upplägget liknar NES-Zelda, men kopiera inte Nintendos karta, figurer, namn eller musik.
@@ -38,7 +40,8 @@ npm run build
 ## Sparning
 
 - `SaveData` finns i `src/game/save.ts`. Nya fält ska få standardvärden i `normalizeSave`, så att gamla sparningar fortfarande går att läsa.
-- Flaggor är strängnycklar: `got:<loc>:<x>,<y>`, `open:<loc>:<x>,<y>`, `boss:<loc>` och `intro`.
+- Flaggor är strängnycklar: `got:<loc>:<x>,<y>`, `open:<loc>:<x>,<y>` (lås, sprickor, guldport), `solved:<loc>` (galler/facklor), `switch:<loc>` (kristall/bro), `boss:<loc>`, `intro` och `ending`.
+- Nycklar räknas per borg (`keys: { d1: 1, ... }`). Gamla sparningar med ett tal flyttas till `d1`.
 - Den nyaste `updatedAt` vinner. En trigger i databasen (`supabase/migrations/0001_saves.sql`) stoppar äldre skrivningar.
 - Utan `.env` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) sparar spelet bara lokalt.
 
@@ -48,5 +51,5 @@ I dev-läge finns spelet som `window.game`. Det är bra för att placera spelare
 
 ## Status och nästa steg
 
-Klart: överjord, 3 grottor, borg 1 (8 rum, nycklar, trollstav, bossen Slemkungen, stjärna), döden med återstart, HUD, sv/en, touchkontroller, sparning och ljudeffekter.
-Inte gjort än: musik, fler borgar, butik för ädelstenarna. Supabase-inloggningen är inte testad mot ett riktigt projekt.
+Klart: överjord, grottor och hus med personer, fyra borgar (Slemkungen, Krabbkungen, Spökkungen, Stjärnslukaren), pussel (knuffa stenar, plattor, galler, facklor, kristaller och broar, sprickor att spränga), bomber, bumerang, sköld, karta, stjärnvingar som slut, väska (inventarie, `I`) och världskarta (`M`, eller tryck på minikartan), flaggor och en snäll figur vid varje avklarad borg (slemmet, krabban, spöket, stjärnbarnet), döden med återstart, HUD, sv/en, touchkontroller, sparning och ljudeffekter.
+Inte gjort än: musik, butik för ädelstenarna. Supabase-inloggningen är inte testad mot ett riktigt projekt.

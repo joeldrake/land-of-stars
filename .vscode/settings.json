@@ -1,5 +1,5 @@
 {
-  "window.title": "${dirty}Adventure-time${separator} ${activeEditorMedium}",
+  "window.title": "${dirty}Land of Stars ${separator} ${activeEditorMedium}",
   "workbench.colorCustomizations": {
     "titleBar.activeForeground": "#fff",
     "titleBar.inactiveForeground": "#fff",

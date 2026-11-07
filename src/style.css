@@ -72,7 +72,8 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 
 #dpad {
   --s: clamp(130px, 22vmax, 210px);
-  position: relative; width: var(--s); height: var(--s); touch-action: none;
+  /* never wider than its column, and always square (it used to get squashed on phones in landscape) */
+  position: relative; width: min(var(--s), 92%); aspect-ratio: 1; flex-shrink: 0; touch-action: none;
 }
 #dpad .arm, #dpad .hub { position: absolute; background: #3a3a50; }
 #dpad .arm { width: 34%; height: 34%; border-radius: 8px; }
@@ -84,7 +85,12 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 #dpad[data-dir="up"] .up, #dpad[data-dir="down"] .down,
 #dpad[data-dir="left"] .left, #dpad[data-dir="right"] .right { background: #6a6a90; }
 
-#buttons { position: relative; width: clamp(150px, 24vmax, 230px); aspect-ratio: 1.2; }
+#buttons { position: relative; width: min(clamp(150px, 24vmax, 230px), 96%); aspect-ratio: 1.2; flex-shrink: 0; }
+@media (orientation: landscape) {
+  /* a bit smaller when the phone lies down: the columns beside the game are narrow */
+  #dpad { --s: clamp(110px, 19vmax, 180px); }
+  #buttons { width: min(clamp(130px, 21vmax, 200px), 96%); }
+}
 .round {
   position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%;
   border: 4px solid rgba(255,255,255,.25); color: #fff;
@@ -93,6 +99,12 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 .round.a { right: 0; top: 8%; background: #c8323c; }
 .round.b { left: 0; bottom: 8%; background: #3459c0; }
 .round.down { filter: brightness(1.4); transform: scale(.94); }
+.bag {
+  position: absolute; left: 4%; top: 0; width: 30%; aspect-ratio: 1; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.25); background: #5a4a2a; color: #fff;
+  font-size: clamp(16px, 3.6vmin, 28px); padding: 0; touch-action: none;
+}
+.bag.down { filter: brightness(1.4); transform: scale(.94); }
 
 /* ---- menus ---- */
 #overlay {

@@ -1,0 +1,14 @@
+// Blockrummet - knuffa stenarna på plattorna / Push the blocks onto the plates
+@npc 13,7 sign sign_blocks
+@reward K 3,5
+################
+#..............#
+#..+....P......#
+#..............#
+#.....WWWW.....#
+#.....WWWW......
+#.....WWWW.....#
+#..............#
+#.......P...+..#
+#..............#
+################

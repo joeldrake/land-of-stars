@@ -1,12 +1,13 @@
-// Overworld 15,7 - lake
-WWWWWWWWW...WWWW
-WW.............W
-WW.s...........W
-WW.............W
-WW.WWWWW.......W
-WW.WWWW..WWWW..W
-..FWWWWWWWWWW..W
-......s.WWWWW..W
-...........s...W
-WW.............W
+// Overworld 15,7 - the secret island. Too far out for the boomerang: only the star wings get you here.
+@door 9,3 -> cave:house-fairy 7,9
+WWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWW
+WWWWWW.AAOA.WWWW
+WWWWW.F....F.WWW
+WWWWW..F..F..WWW
+WWWWWW.T..T.WWWW
+WWWWWWW....WWWWW
+WWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWW

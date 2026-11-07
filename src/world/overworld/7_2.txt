@@ -1,8 +1,9 @@
 // Overworld 7,2 - mountains
+@door 4,3 -> cave:stargazer 7,9
 MMMM,,MMMMMMMMMM
 MM,,,,,,,,,,,,MM
 MM,,,,,,,,,,,,MM
-MMM,MM,,,,,,R,MM
+MMM,DM,,,,,,R,MM
 MM,,,,,RR,g,,,MM
 MM,,,,,,,MM,,,MM
 MM,,,MM,MM,M,,,,

@@ -1,5 +1,6 @@
 // Overworld 13,4 - lake
 @door 7,3 -> d1:2:3 7,9
+@npc 9,4 slimey castle_d1 star:d1
 WWWWWWWWWWW...WW
 WW..CCCCCCC...WW
 ....CCCCCCC...WW

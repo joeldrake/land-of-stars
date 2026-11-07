@@ -1,6 +1,6 @@
 import type { Dir } from './types';
 
-export type Btn = 'a' | 'b' | 'menu';
+export type Btn = 'a' | 'b' | 'menu' | 'inv' | 'map';
 
 const KEY_DIR: Record<string, Dir> = {
   ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
@@ -9,6 +9,7 @@ const KEY_DIR: Record<string, Dir> = {
 const KEY_BTN: Record<string, Btn> = {
   Space: 'a', KeyJ: 'a', KeyZ: 'a', Enter: 'a',
   KeyX: 'b', KeyK: 'b',
+  KeyI: 'inv', KeyC: 'inv', Tab: 'inv', KeyM: 'map',
   Escape: 'menu', KeyP: 'menu',
 };
 
@@ -19,6 +20,8 @@ export class Input {
   private stack: Dir[] = [];
   private touchDir: Dir | null = null;
   private pressed = new Set<Btn>();
+  /** Direction presses since the last frame, so menus never miss a quick tap. */
+  private dirTaps: Dir[] = [];
 
   constructor() {
     addEventListener('keydown', e => {
@@ -27,6 +30,7 @@ export class Input {
       if (d) {
         e.preventDefault();
         if (!this.stack.includes(d)) this.stack.push(d);
+        if (!e.repeat) this.dirTaps.push(d);
         return;
       }
       const b = KEY_BTN[e.code];
@@ -53,12 +57,19 @@ export class Input {
     return had;
   }
 
-  flush() { this.pressed.clear(); }
+  /** Press a button from code (taps on the game screen). */
+  press(b: Btn) { this.pressed.add(b); }
+
+  /** The oldest direction tap not yet handled (for menus). */
+  consumeDir(): Dir | null { return this.dirTaps.shift() ?? null; }
+
+  flush() { this.pressed.clear(); this.dirTaps = []; }
 
   reset() {
     this.stack = [];
     this.touchDir = null;
     this.pressed.clear();
+    this.dirTaps = [];
   }
 
   bindDpad(el: HTMLElement) {
@@ -68,7 +79,11 @@ export class Input {
       const dx = e.clientX - (r.left + r.width / 2);
       const dy = e.clientY - (r.top + r.height / 2);
       if (Math.hypot(dx, dy) < r.width * 0.1) this.touchDir = null;
-      else this.touchDir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      else {
+        const d: Dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+        if (d !== this.touchDir) this.dirTaps.push(d);
+        this.touchDir = d;
+      }
       el.dataset.dir = this.touchDir ?? '';
     };
     const end = (e: PointerEvent) => {

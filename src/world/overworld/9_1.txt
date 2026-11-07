@@ -1,6 +1,7 @@
-// Overworld 9,1 - mountains
+// Overworld 9,1 - mountains. A crack in the cliff: bomb it to find the shield cave.
+@door 6,1 -> cave:shield 7,9
 MMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMM
+MMMMMM%MMMMMMMMM
 MM,RR,,,,,,,,,,M
 MM,M,,,,,bM,,,,M
 MM,,M,,,,,,,,,,M

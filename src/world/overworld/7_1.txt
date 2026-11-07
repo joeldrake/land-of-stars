@@ -1,12 +1,14 @@
-// Overworld 7,1 - mountains
+// Overworld 7,1 - mountains: Stjärnborgen behind the star gate. The star key is in the pond.
+@door 8,2 -> d4:2:4 7,9
+@npc 10,3 starry castle_d4 star:d4
 MMMMMMMMMMMMMMMM
+M,,,,,CCCCCC,,MM
+M,,,,,CCDCCC,,MM
+M,,,,,,,V,,,,,MM
 M,,,,,,,,,,,,,MM
-M,,,R,b,,,,,,,MM
-M,,,,,,,,,,,,,MM
-M,,,,,,,,R,,,,MM
-M,,,,,,,,,,,,RMM
-,,,,,,,,,,,,,RMM
-,,,,,R,,,,,,,,MM
-,,,,,M,g,,,,,,MM
+M,,WWWWW,,,,,RMM
+,,,WW7WW,,,,,RMM
+,,,WWWWW,,,,,,MM
+,,,,,,,,,g,,,,MM
 M,,,,,,,,,,,,,MM
 MMMM,,MMMMMMMMMM

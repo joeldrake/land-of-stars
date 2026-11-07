@@ -1,0 +1,12 @@
+// Nyckeln i vattnet - hämta den med bumerangen / Fetch the key with the boomerang
+################
+#..............#
+#..WWWWWWWWW...#
+#..WWWWWWWWW...#
+#..WWWWKWWWW...#
+#..WWWWWWWWW....
+#..WWWWWWWWW...#
+#..............#
+#...v......v...#
+#..............#
+################

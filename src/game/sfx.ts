@@ -98,6 +98,17 @@ const sounds = {
   bossDie: () => { noise(0, 0.9, 0.5, 5000, 100); tone(400, 0, 0.9, 'square', 0.2, 40); },
   die: () => melody([[N.A5, 0.15], [N.F5, 0.15], [N.D5, 0.15], [N.A4, 0.45]], 'triangle', 0.6),
   door: () => { tone(300, 0, 0.12, 'triangle', 0.4, 150); },
+  bombPut: () => { tone(500, 0, 0.06, 'square', 0.2, 300); noise(0.02, 0.1, 0.1, 6000, 3000); },
+  bomb: () => { noise(0, 0.7, 0.6, 2500, 60); tone(120, 0, 0.5, 'square', 0.3, 30); },
+  boomerang: () => { tone(600, 0, 0.12, 'triangle', 0.25, 900); tone(900, 0.12, 0.12, 'triangle', 0.25, 600); },
+  push: () => { noise(0, 0.25, 0.25, 800, 200); },
+  click: () => { tone(880, 0, 0.05, 'square', 0.25); tone(1320, 0.06, 0.08, 'square', 0.25); },
+  torch: () => { noise(0, 0.35, 0.3, 1500, 4000); tone(300, 0, 0.3, 'triangle', 0.2, 600); },
+  crystal: () => melody([[N.E6, 0.08], [N.G6, 0.08], [N.E6, 0.08], [N.G6, 0.2]], 'triangle', 0.4),
+  clang: () => { tone(1400, 0, 0.15, 'square', 0.2, 1200); tone(1900, 0, 0.15, 'square', 0.12, 1700); },
+  /** Something hidden appeared: a short rising jingle. */
+  secret: () => melody([[N.G5, 0.1], [N.B5, 0.1], [N.D5 * 2, 0.1], [N.G6, 0.3]], 'square', 0.25),
+  menu: () => { tone(660, 0, 0.05, 'square', 0.2); },
 };
 
 export type Sound = keyof typeof sounds;

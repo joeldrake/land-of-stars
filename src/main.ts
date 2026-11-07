@@ -1,6 +1,6 @@
 import './style.css';
 import { cloud } from './cloud';
-import { VIEW_H, VIEW_W } from './config';
+import { START, VIEW_H, VIEW_W } from './config';
 import { art } from './game/art';
 import { Game } from './game/game';
 import { Input } from './game/input';
@@ -23,7 +23,15 @@ const input = new Input();
 input.bindDpad($('dpad'));
 input.bindButton($('btn-a'), 'a');
 input.bindButton($('btn-b'), 'b');
+input.bindButton($('btn-inv'), 'inv');
 $('btn-menu').addEventListener('click', () => openSettings());
+
+// Taps on the game screen: the mini map opens the big map, the item boxes open the bag.
+canvas.addEventListener('pointerdown', e => {
+  if (!game || screen !== 'game') return;
+  const r = canvas.getBoundingClientRect();
+  game.tap(((e.clientX - r.left) / r.width) * VIEW_W, ((e.clientY - r.top) / r.height) * VIEW_H);
+});
 
 const dialog = new Dialog($('dialog'), $('dialog-text'), $('dialog-speak'));
 const saves = new SaveManager();
@@ -38,8 +46,12 @@ addEventListener('pointerdown', e => {
   if (e.pointerType === 'touch' && !isTouch()) { document.body.classList.add('touch'); fit(); }
 }, { capture: true });
 
+const app = $('app');
 function fit() {
-  let w = innerWidth, h = innerHeight;
+  // Leave out the safe areas (iPhone notch / home bar) that #app pads away.
+  const cs = getComputedStyle(app);
+  let w = innerWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  let h = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   if (isTouch()) {
     if (h >= w) h *= 0.6;
     else w -= 2 * Math.min(220, w * 0.24);
@@ -215,10 +227,75 @@ function renderSettings() {
         showTitle();
       }, () => { confirmReset = false; renderSettings(); })
       : btn(t('reset'), () => { confirmReset = true; renderSettings(); }, 'danger'),
+    ...(import.meta.env.DEV ? devSection() : []),
     settingsFrom === 'game' && btn(t('toTitle'), () => { void saves.flush(); showTitle(); }),
     btn(settingsFrom === 'game' ? t('backToGame') : t('back'), closeSettings, 'primary'),
   ]);
   show(panel);
+}
+
+// Dev mode only (npm run dev). import.meta.env.DEV is false in the build, so this is dropped there.
+const DEV_PLACES: [string, string, number, number][] = [
+  ['START', START.loc, START.tx, START.ty],
+  ['SVÄRDSGROTTAN', 'cave:sword', 7, 8],
+  ['HJÄRTGROTTAN', 'cave:heart', 7, 8],
+  ['TIPSGROTTAN', 'cave:hint', 7, 8],
+  ['BORG 1 ENTRÉ', 'ow:13:4', 7, 5],
+  ['BORG 1 INNE', 'd1:2:3', 7, 8],
+  ['BOSSRUMMET', 'd1:2:0', 7, 8],
+  ['FISKAREN', 'ow:12:3', 11, 4],
+  ['VATTENBORGEN (SJÖN)', 'ow:13:2', 9, 8],
+  ['VATTENBORGEN INNE', 'd2:1:3', 7, 8],
+  ['KYRKOGÅRDEN', 'ow:2:4', 10, 4],
+  ['SPÖKBORGEN INNE', 'd3:1:3', 7, 8],
+  ['HEMLIGA GRAVEN', 'ow:1:5', 9, 5],
+  ['STJÄRNKIKAREN', 'ow:7:2', 4, 5],
+  ['SKÖLDSPRICKAN', 'ow:9:1', 6, 3],
+  ['HEMLIGA ÖN', 'ow:15:7', 9, 5],
+  ['STJÄRNPORTEN', 'ow:7:1', 5, 9],
+  ['STJÄRNBORGEN INNE', 'd4:2:4', 7, 8],
+  ['STJÄRNSLUKAREN', 'd4:2:0', 7, 8],
+];
+
+function devSection(): Child[] {
+  if (!game) return [h('h2', {}, ['DEV']), h('p', { class: 'small' }, ['Starta spelet för att se fusk-knapparna.'])];
+  const g = game;
+  const s = g.save;
+  const act = (label: string, fn: () => void, cls = '') => btn(label, () => { fn(); g.persist(); renderSettings(); }, cls);
+  const go = (loc: string, tx: number, ty: number) => { g.devWarp(loc, tx, ty); closeSettings(); };
+  return [
+    h('h2', {}, ['DEV']),
+    h('div', { class: 'row' }, [
+      act(s.items.sword ? 'SVÄRD ✓' : 'SVÄRD', () => { s.items.sword = !s.items.sword; }, s.items.sword ? 'selected' : ''),
+      act(s.items.staff ? 'TROLLSTAV ✓' : 'TROLLSTAV', () => { s.items.staff = !s.items.staff; }, s.items.staff ? 'selected' : ''),
+    ]),
+    h('div', { class: 'row' }, [
+      act(s.items.bombs ? 'BOMBER ✓' : 'BOMBER', () => { s.items.bombs = !s.items.bombs; s.bombs = s.items.bombs ? 8 : 0; }, s.items.bombs ? 'selected' : ''),
+      act(s.items.boomerang ? 'BUMERANG ✓' : 'BUMERANG', () => { s.items.boomerang = !s.items.boomerang; }, s.items.boomerang ? 'selected' : ''),
+    ]),
+    h('div', { class: 'row' }, [
+      act(s.items.map ? 'KARTA ✓' : 'KARTA', () => { s.items.map = !s.items.map; }, s.items.map ? 'selected' : ''),
+      act(s.items.starKey ? 'STJÄRNNYCKEL ✓' : 'STJÄRNNYCKEL', () => { s.items.starKey = !s.items.starKey; }, s.items.starKey ? 'selected' : ''),
+      act(s.items.shield ? 'SKÖLD ✓' : 'SKÖLD', () => { s.items.shield = !s.items.shield; }, s.items.shield ? 'selected' : ''),
+      act(s.items.crown ? 'KRONA ✓' : 'KRONA', () => { s.items.crown = !s.items.crown; }, s.items.crown ? 'selected' : ''),
+      act(s.items.wings ? 'VINGAR ✓' : 'VINGAR', () => { s.items.wings = !s.items.wings; }, s.items.wings ? 'selected' : ''),
+    ]),
+    h('div', { class: 'row' }, [
+      act('+5 NYCKLAR HÄR', () => { const a = g.room.def.area; s.keys[a] = (s.keys[a] ?? 0) + 5; }),
+      act('+50 STENAR', () => { s.gems = Math.min(999, s.gems + 50); }),
+    ]),
+    h('div', { class: 'row' }, [
+      act('FULLA HJÄRTAN', () => { s.hp = s.maxHp; }),
+      act('+1 HJÄRTA', () => { s.maxHp = Math.min(32, s.maxHp + 2); s.hp = s.maxHp; }),
+    ]),
+    h('div', { class: 'row' }, [
+      act(g.god ? 'ODÖDLIG ✓' : 'ODÖDLIG', () => { g.god = !g.god; }, g.god ? 'selected' : ''),
+      btn('DÖDA ALLA', () => { g.devKillAll(); closeSettings(); }),
+    ]),
+    btn('ÅTERSTÄLL KISTOR, DÖRRAR, BOSS', () => { g.devResetWorld(); closeSettings(); }),
+    h('p', { class: 'small' }, [`${s.pos.loc}  ·  STJÄRNOR: ${s.stars.join(', ') || '-'}`]),
+    ...DEV_PLACES.map(([label, loc, tx, ty]) => btn(`→ ${label}`, () => go(loc, tx, ty))),
+  ];
 }
 
 function cloudSection(): Child[] {

@@ -1,8 +1,8 @@
-// Overworld 15,2 - lake
+// Overworld 15,2 - lake. A little island you can only reach with wings (or the boomerang).
 WWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWW
 W....s..FWWWWWWW
-.........WWWWWWW
+.........WW$H$WW
 ......s..WWWWWWW
 ....F....s.W..WW
 W..WWW........WW

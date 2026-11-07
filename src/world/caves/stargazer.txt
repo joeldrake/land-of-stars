@@ -1,0 +1,14 @@
+// Stjärnkikarens grotta / The stargazer's cave
+@npc 7,3 stargazer stargazer stargazer_bye boomerang=stargazer_boomerang
+@exit down -> ow:7:2 4,4
+################
+################
+##............##
+##............##
+##............##
+##............##
+##............##
+##............##
+##............##
+##............##
+#######..#######

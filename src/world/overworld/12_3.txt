@@ -1,7 +1,8 @@
 // Overworld 12,3 - lake
+@door 11,2 -> cave:house-fisher 7,9
 WWWWWWWWWWWWWWWW
-WW............WW
-.........s....WW
+WW.......AAAA.WW
+........sAAOA.WW
 ..............WW
 WW......WWW...WW
 WW..............

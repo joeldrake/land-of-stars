@@ -1,0 +1,13 @@
+// Vattenhallen - skjut magi på kristallen så kommer bron / Shoot the crystal to make the bridge
+@npc 3,6 sign sign_crystal
+#######..#######
+#..............#
+#..S.......Q...#
+#WWWWWWW__WWWWW#
+#WWWWWWW__WWWWW#
+................
+#..............#
+#...c......c...#
+#..............#
+#..............#
+#######..#######

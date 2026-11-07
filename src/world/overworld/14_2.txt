@@ -4,9 +4,9 @@ WWWWWWWWWWWWWWWW
 WW............WW
 WW......FF.FF...
 WW..............
-......s.........
-...F.....WWW..WW
+WW....s.........
+WW.F.....WWW..WW
 WW......WWWWWFWW
-WW.......WWW..WW
-WW............WW
+.........WWW..WW
+..............WW
 WWWWWWWWWW...WWW
