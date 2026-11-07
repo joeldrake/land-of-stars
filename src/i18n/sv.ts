@@ -28,6 +28,8 @@ export const sv = {
   status_error: 'KUNDE INTE SPARA I MOLNET',
   reset: 'BÖRJA OM FRÅN BÖRJAN',
   resetConfirm: 'ALLT DU HAR FÅTT FÖRSVINNER. SÄKER?',
+  resetType: 'SKRIV OMSTART FÖR ATT BÖRJA OM.',
+  resetWord: 'OMSTART',
   yes: 'JA',
   no: 'NEJ',
   controlsHint: 'PILAR: GÅ   MELLANSLAG: SVÄRD   X: MAGI   ESC: MENY',

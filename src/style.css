@@ -8,7 +8,7 @@
 * { box-sizing: border-box; }
 html, body {
   margin: 0; height: 100%; background: var(--bg); color: var(--text);
-  overflow: hidden; overscroll-behavior: none;
+  overflow: hidden; overscroll-behavior: none; touch-action: none;
 }
 body {
   font-family: var(--font);
@@ -119,6 +119,7 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 }
 .btn.primary { background: var(--accent); color: #2a1a10; border-color: #fff3c0; }
 .btn.danger { border-color: #c8323c; }
+.btn:disabled { opacity: .35; cursor: default; }
 .btn.selected { border-color: var(--accent); background: #3a3420; }
 .row { display: flex; gap: 10px; }
 .row > * { flex: 1; }

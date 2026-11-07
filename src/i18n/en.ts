@@ -27,6 +27,8 @@ export const en: Record<keyof typeof sv, string> = {
   status_error: 'COULD NOT SAVE IN THE CLOUD',
   reset: 'START OVER',
   resetConfirm: 'EVERYTHING YOU GOT WILL BE GONE. SURE?',
+  resetType: 'TYPE RESTART TO START OVER.',
+  resetWord: 'RESTART',
   yes: 'YES',
   no: 'NO',
   controlsHint: 'ARROWS: WALK   SPACE: SWORD   X: MAGIC   ESC: MENU',

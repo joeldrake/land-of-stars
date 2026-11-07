@@ -49,6 +49,21 @@ function fit() {
 addEventListener('resize', fit);
 fit();
 
+// iOS Safari ignores user-scalable=no: block double-tap and pinch zoom by hand.
+// Buttons and inputs are left alone (touch-action: manipulation already covers them)
+// so their clicks still fire.
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = e.timeStamp;
+  const target = e.target as Element | null;
+  if (now - lastTouchEnd < 350 && !target?.closest('button, input, a')) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) {
+  document.addEventListener(ev, e => e.preventDefault(), { passive: false });
+}
+
 // ------------------------------------------------------------- tiny DOM helper
 type Child = Node | string | null | false;
 function h(tag: string, attrs: Record<string, string | ((e: Event) => void)> = {}, children: Child[] = []) {
@@ -61,6 +76,27 @@ function h(tag: string, attrs: Record<string, string | ((e: Event) => void)> = {
   return el;
 }
 const btn = (label: string, onClick: () => void, cls = '') => h('button', { class: `btn ${cls}`, click: onClick }, [label]);
+
+/** Wiping progress needs the word typed in, so a child can't do it by tapping around. */
+const RESET_WORDS = ['OMSTART', 'RESTART'];
+function resetConfirm(onYes: () => void, onNo: () => void) {
+  const field = h('input', {
+    class: 'field name', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false',
+    placeholder: t('resetWord'),
+  }) as HTMLInputElement;
+  const yes = btn(t('reset'), () => { if (ok()) onYes(); }, 'danger') as HTMLButtonElement;
+  const ok = () => RESET_WORDS.includes(field.value.trim().toLocaleUpperCase());
+  const update = () => { yes.disabled = !ok(); };
+  field.addEventListener('input', update);
+  field.addEventListener('keydown', e => { if (e.key === 'Enter' && ok()) onYes(); });
+  update();
+  return h('div', { class: 'panel' }, [
+    h('p', { class: 'msg' }, [t('resetConfirm')]),
+    h('p', {}, [t('resetType')]),
+    field,
+    h('div', { class: 'row' }, [btn(t('no'), onNo, 'primary'), yes]),
+  ]);
+}
 
 function show(panel: HTMLElement) {
   overlay.replaceChildren(panel);
@@ -90,10 +126,7 @@ function showTitle(confirmNew = false) {
     h('h1', {}, [t('title')]),
     h('div', { class: 'hero' }, [heroCanvas()]),
     ...(confirmNew
-      ? [
-        h('p', { class: 'msg' }, [t('resetConfirm')]),
-        h('div', { class: 'row' }, [btn(t('yes'), () => startGame(true), 'danger'), btn(t('no'), () => showTitle())]),
-      ]
+      ? [resetConfirm(() => startGame(true), () => showTitle())]
       : [
         has ? btn(t('continue'), () => startGame(false), 'primary') : btn(t('newGame'), () => startGame(true), 'primary'),
         has && btn(t('newGame'), () => showTitle(true)),
@@ -169,17 +202,11 @@ function renderSettings() {
     ...cloudSection(),
     h('h2', {}, ['']),
     confirmReset
-      ? h('div', { class: 'panel' }, [
-        h('p', { class: 'msg' }, [t('resetConfirm')]),
-        h('div', { class: 'row' }, [
-          btn(t('yes'), () => {
-            game?.stop(); game = null;
-            saves.save(newSave(settings.name));
-            showTitle();
-          }, 'danger'),
-          btn(t('no'), () => { confirmReset = false; renderSettings(); }),
-        ]),
-      ])
+      ? resetConfirm(() => {
+        game?.stop(); game = null;
+        saves.save(newSave(settings.name));
+        showTitle();
+      }, () => { confirmReset = false; renderSettings(); })
       : btn(t('reset'), () => { confirmReset = true; renderSettings(); }, 'danger'),
     settingsFrom === 'game' && btn(t('toTitle'), () => { void saves.flush(); showTitle(); }),
     btn(settingsFrom === 'game' ? t('backToGame') : t('back'), closeSettings, 'primary'),

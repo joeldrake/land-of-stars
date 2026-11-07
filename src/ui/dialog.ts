@@ -20,7 +20,10 @@ export class Dialog {
     this.ghost.className = 'ghost';
     text.replaceChildren(this.seen, this.ghost);
     box.addEventListener('pointerdown', e => { e.preventDefault(); this.advance(); });
-    speak.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); this.speak(); });
+    // Mobile browsers only allow speech from a "real" user action. A touch pointerdown
+    // doesn't count, a click does, so stop pointerdown here and speak on click.
+    speak.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); });
+    speak.addEventListener('click', e => { e.stopPropagation(); this.speak(); });
     if (!('speechSynthesis' in window)) speak.hidden = true;
   }
 
@@ -76,11 +79,27 @@ export class Dialog {
 
   private speak() {
     if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
+    // iOS Safari can drop an utterance queued right after cancel(), so only cancel if needed.
+    if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+    const lang = speechLang();
     // Lowercase so the voice reads words, not letters.
-    const u = new SpeechSynthesisUtterance(this.full.toLocaleLowerCase(speechLang()));
-    u.lang = speechLang();
+    const u = new SpeechSynthesisUtterance(this.full.toLocaleLowerCase(lang));
+    u.lang = lang;
     u.rate = 0.85;
+    const voice = pickVoice(lang);
+    if (voice) u.voice = voice;
+    speechSynthesis.resume(); // Chrome on Android can get stuck paused.
     speechSynthesis.speak(u);
   }
 }
+
+function pickVoice(lang: string) {
+  const voices = speechSynthesis.getVoices();
+  const base = lang.slice(0, 2);
+  return voices.find(v => v.lang.replace('_', '-') === lang)
+    ?? voices.find(v => v.lang.toLowerCase().startsWith(base))
+    ?? null;
+}
+
+// Voices load asynchronously in some browsers; touching the list early warms it up.
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
