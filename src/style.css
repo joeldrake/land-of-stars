@@ -99,8 +99,8 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 #buttons { position: relative; width: min(clamp(150px, 24vmax, 230px), 96%); aspect-ratio: 1.2; flex-shrink: 0; }
 @media (orientation: landscape) {
   /* a bit smaller when the phone lies down: the columns beside the game are narrow */
-  #dpad { --s: clamp(110px, 19vmax, 180px); }
-  #buttons { width: min(clamp(130px, 21vmax, 200px), 96%); }
+  #dpad { --s: clamp(96px, 15.5vmax, 160px); }
+  #buttons { width: min(clamp(110px, 17vmax, 175px), 96%); }
 }
 .round {
   position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%;
@@ -111,7 +111,8 @@ body.touch .pad { display: flex; align-items: center; justify-content: center; m
 .round.b { left: 0; bottom: 8%; background: #3459c0; }
 .round.down { filter: brightness(1.4); transform: scale(.94); }
 .bag {
-  position: absolute; left: 4%; top: 0; width: 30%; aspect-ratio: 1; border-radius: 50%;
+  /* above the B button with a clear gap, so it isn't pressed by mistake */
+  position: absolute; left: 6%; top: -30%; width: 30%; aspect-ratio: 1; border-radius: 50%;
   border: 3px solid rgba(255,255,255,.25); background: #5a4a2a; color: #fff;
   font-size: clamp(16px, 3.6vmin, 28px); padding: 0; touch-action: none;
 }

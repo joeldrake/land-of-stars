@@ -63,7 +63,8 @@ function fit() {
   let h = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   if (isTouch()) {
     if (h >= w) h *= 0.6;
-    else w -= 2 * Math.min(220, w * 0.24);
+    // landscape: keep room for the controls on both sides (matches the sizes in style.css)
+    else w -= 2 * Math.min(190, w * 0.2);
   }
   const s = Math.min(w / VIEW_W, h / VIEW_H);
   frame.style.width = `${Math.floor(VIEW_W * s)}px`;
