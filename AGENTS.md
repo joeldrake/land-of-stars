@@ -17,7 +17,7 @@ npm run build
 - Vanilla TypeScript, Vite och en `<canvas>`. Inget ramverk.
 - **All grafik ritas i kod** i `src/game/art.ts`: pixel-sprites som ASCII-kartor och rutor med enkla primitiver. Inga bildfiler.
 - Intern upplösning är 256×224 (16×11 rutor à 16 px plus 48 px HUD), ritad med `RENDER_SCALE` 3 så att den blir skarp. CSS skalar sedan bilden.
-- `src/game/game.ts` innehåller spellogik och rendering. `world.ts` läser världsfilerna via `import.meta.glob`. Övriga filer: `input.ts` (tangentbord och touch), `hud.ts`, `save.ts`.
+- `src/game/game.ts` innehåller spellogik och rendering. `world.ts` läser världsfilerna via `import.meta.glob`. Övriga filer: `input.ts` (tangentbord och touch), `hud.ts`, `save.ts`, `sfx.ts` (ljudeffekter med Web Audio, inga ljudfiler).
 - `src/main.ts` sköter menyer och inställningar som HTML-overlay. `src/ui/dialog.ts` är textrutan.
 - `src/cloud.ts` hanterar Supabase-inloggning (e-post med OTP-kod) och tabellen `saves`. `src/storage.ts` har `SaveManager` (localStorage plus synk).
 
@@ -48,5 +48,5 @@ I dev-läge finns spelet som `window.game`. Det är bra för att placera spelare
 
 ## Status och nästa steg
 
-Klart: överjord, 3 grottor, borg 1 (8 rum, nycklar, trollstav, bossen Slemkungen, stjärna), döden med återstart, HUD, sv/en, touchkontroller och sparning.
-Inte gjort än: ljud, fler borgar, butik för ädelstenarna. Supabase-inloggningen är inte testad mot ett riktigt projekt.
+Klart: överjord, 3 grottor, borg 1 (8 rum, nycklar, trollstav, bossen Slemkungen, stjärna), döden med återstart, HUD, sv/en, touchkontroller, sparning och ljudeffekter.
+Inte gjort än: musik, fler borgar, butik för ädelstenarna. Supabase-inloggningen är inte testad mot ett riktigt projekt.

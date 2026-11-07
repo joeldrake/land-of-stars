@@ -5,6 +5,7 @@ import { art } from './game/art';
 import { Game } from './game/game';
 import { Input } from './game/input';
 import { newSave } from './game/save';
+import { sfxState } from './game/sfx';
 import { LANGS, setLang, t, type Lang } from './i18n';
 import { loadSettings, SaveManager, storeSettings } from './storage';
 import { Dialog } from './ui/dialog';
@@ -16,6 +17,7 @@ const overlay = $('overlay');
 
 const settings = loadSettings();
 setLang(settings.lang);
+sfxState.enabled = settings.sound;
 
 const input = new Input();
 input.bindDpad($('dpad'));
@@ -196,6 +198,11 @@ function renderSettings() {
     h('h1', {}, [t('settings')]),
     h('h2', {}, [t('language')]),
     langRow,
+    h('h2', {}, [t('sound')]),
+    h('div', { class: 'row' }, [true, false].map(on =>
+      btn(on ? t('on') : t('off'), () => {
+        settings.sound = on; sfxState.enabled = on; storeSettings(settings); renderSettings();
+      }, settings.sound === on ? 'selected' : ''))),
     h('h2', {}, [t('name')]),
     nameInput,
     h('h2', {}, [t('cloud')]),

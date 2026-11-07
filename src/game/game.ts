@@ -3,6 +3,7 @@ import { t } from '../i18n';
 import type { Dialog } from '../ui/dialog';
 import { art, paintRoom } from './art';
 import { drawHud } from './hud';
+import { play } from './sfx';
 import type { Input } from './input';
 import type { SaveData } from './save';
 import { blocksShot, isSolid } from './tiles';
@@ -349,11 +350,12 @@ export class Game {
 
     if (this.input.consume('a')) {
       if (this.tryTalk()) return;
-      if (this.save.items.sword) { p.attack = ATTACK_TIME; return; }
+      if (this.save.items.sword) { p.attack = ATTACK_TIME; play('sword'); return; }
     }
     if (this.input.consume('b') && this.save.items.staff && !this.shots.some(s => s.friendly)) {
       const [vx, vy] = DIR_VEC[p.dir];
       this.shots.push({ x: p.x + 8 + vx * 8, y: p.y + 10 + vy * 8, vx: vx * 160, vy: vy * 160, r: 4, friendly: true, dmg: 2, kind: 'magic', life: 2 });
+      play('magic');
     }
 
     const d = this.input.dir;
@@ -375,10 +377,11 @@ export class Game {
     const tx = Math.floor((p.x + 8 + vx * 10) / TILE), ty = Math.floor((p.y + 11 + vy * 10) / TILE);
     if (this.room.tiles[ty]?.[tx] !== 'L') return;
     if (this.save.keys <= 0) {
-      if (!this.room.lockedSaid) { this.room.lockedSaid = true; this.say('locked'); }
+      if (!this.room.lockedSaid) { this.room.lockedSaid = true; play('locked'); this.say('locked'); }
       return;
     }
     this.save.keys--;
+    play('unlock');
     // open every connected lock tile (doors are 2 tiles wide)
     const q: [number, number][] = [[tx, ty]];
     while (q.length) {
@@ -398,6 +401,7 @@ export class Game {
     const tx = Math.floor((p.x + 8) / TILE), ty = Math.floor((p.y + 11) / TILE);
     if (this.room.tiles[ty]?.[tx] !== 'D') return;
     const door = this.room.def.doors.find(d => d.tx === tx && d.ty === ty);
+    if (door) play('door');
     if (door) this.warpTo(door.to, door.ax * TILE, door.ay * TILE, 'up');
   }
 
@@ -466,6 +470,7 @@ export class Game {
     const len = Math.hypot(dx, dy) || 1;
     dx /= len; dy /= len;
     p.kbx = dx * 170; p.kby = dy * 170; p.kbT = 0.14;
+    play(this.save.hp <= 0 ? 'die' : 'hurt');
     if (this.save.hp <= 0) {
       this.save.hp = 0;
       this.mode = 'dead';
@@ -577,7 +582,8 @@ export class Game {
       dx /= len; dy /= len;
       e.kbx = dx * 180; e.kby = dy * 180; e.kbT = 0.15;
     }
-    if (e.hp > 0) return;
+    if (e.hp > 0) { play('hit'); return; }
+    play(e.kind === 'X' ? 'bossDie' : 'kill');
     this.enemies = this.enemies.filter(x => x !== e);
     const cx = e.x + e.size / 2, cy = e.y + e.size / 2;
     this.effects.push({ kind: 'puff', x: cx, y: cy, t: 0, dur: 0.4 });
@@ -642,13 +648,14 @@ export class Game {
     let msg: string | null = null;
     let then: (() => void) | undefined;
     switch (pk.ch) {
-      case 'h': s.hp = Math.min(s.maxHp, s.hp + 2); break;
-      case '$': s.gems = Math.min(999, s.gems + 1); break;
-      case 'K': s.keys++; break;
-      case 'H': s.maxHp = Math.min(32, s.maxHp + 2); s.hp = s.maxHp; msg = 'got_heart'; break;
-      case '1': s.items.sword = true; msg = 'got_sword'; break;
-      case '2': s.items.staff = true; msg = 'got_staff'; break;
+      case 'h': s.hp = Math.min(s.maxHp, s.hp + 2); play('heart'); break;
+      case '$': s.gems = Math.min(999, s.gems + 1); play('gem'); break;
+      case 'K': s.keys++; play('key'); break;
+      case 'H': s.maxHp = Math.min(32, s.maxHp + 2); s.hp = s.maxHp; msg = 'got_heart'; play('item'); break;
+      case '1': s.items.sword = true; msg = 'got_sword'; play('item'); break;
+      case '2': s.items.staff = true; msg = 'got_staff'; play('item'); break;
       case '*': {
+        play('star');
         const area = this.room.def.area;
         if (!s.stars.includes(area)) s.stars.push(area);
         s.hp = s.maxHp;

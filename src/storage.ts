@@ -14,12 +14,12 @@ function writeJson(k: string, v: unknown) {
   try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode / quota */ }
 }
 
-export interface Settings { lang: Lang; name: string }
+export interface Settings { lang: Lang; name: string; sound: boolean }
 
 export function loadSettings(): Settings {
   const s = readJson(SETTINGS_KEY) as Partial<Settings> | null;
   const navSv = (navigator.language || 'sv').toLowerCase().startsWith('sv');
-  return { lang: s?.lang ?? (navSv ? 'sv' : 'en'), name: s?.name ?? 'MIRA' };
+  return { lang: s?.lang ?? (navSv ? 'sv' : 'en'), name: s?.name ?? 'MIRA', sound: s?.sound ?? true };
 }
 export function storeSettings(s: Settings) { writeJson(SETTINGS_KEY, s); }
 
