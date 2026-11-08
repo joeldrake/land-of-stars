@@ -1,10 +1,12 @@
 import { COLS, HUD_H, RENDER_SCALE, ROOM_H, ROOM_W, ROWS, START, STEP, TILE, VIEW_H, VIEW_W } from '../config';
-import { t } from '../i18n';
+import { hasText, t } from '../i18n';
 import type { Dialog } from '../ui/dialog';
 import { art, paintRoom, tileImage } from './art';
+import { Guide } from './guide';
 import { drawHud, drawInventory, drawWorldMap, HUD_TAP, INV_COLS, INV_SLOTS, invSlotAt } from './hud';
 import { play } from './sfx';
 import type { Input } from './input';
+import type { Gesture } from './touch';
 import { B_ITEMS, MAX_BOMBS, type BItem, type Items, type SaveData } from './save';
 import { blocksShot, isSolid, isWater } from './tiles';
 import { DIR_VEC, DIRS, type Dir } from './types';
@@ -13,7 +15,15 @@ import { entranceOf, locInfo, neighborLoc, ROOMS, type Npc, type RoomDef } from 
 /** Player hitbox inside the 16x16 sprite: the lower part, so the head can overlap walls. */
 const HB = { ox: 3, oy: 6, w: 10, h: 10 };
 const PLAYER_SPEED = 80;
-const ATTACK_TIME = 0.28;
+/** A sword slash sweeps a wide arc; the spin attack goes all the way round. */
+const SLASH_TIME = 0.2;
+const SLASH_ARC = 2.4; // ~140 degrees
+const SPIN_TIME = 0.42;
+const SPIN_COOLDOWN = 0.6;
+/** Distances from her middle where the blade can hit. */
+const BLADE = [6, 11, 16, 21, 25];
+const SPIN_BLADE = [...BLADE, 29];
+const SPIN_REACH = 30;
 const PUSH_TIME = 0.3;
 const SLIDE_TIME = 0.2;
 const BOMB_FUSE = 1.3;
@@ -59,8 +69,18 @@ interface Shot {
   /** Boomerang only. */
   back?: boolean; t?: number; carry?: Pickup; hit?: Set<Enemy>;
 }
+interface Slash {
+  /** Middle of the swing (radians); the blade sweeps across it. */
+  angle: number;
+  /** +1 clockwise, -1 counter-clockwise. */
+  sign: number;
+  spin: boolean;
+  t: number;
+  prevK: number;
+  hit: Set<Enemy>;
+}
 interface Pickup { ch: string; x: number; y: number; flag?: string; life?: number }
-interface Effect { kind: 'puff' | 'sparkle' | 'boom'; x: number; y: number; t: number; dur: number }
+interface Effect { kind: 'puff' | 'sparkle' | 'boom' | 'leaves'; x: number; y: number; t: number; dur: number }
 interface Bomb { x: number; y: number; t: number }
 
 interface RoomRT {
@@ -100,7 +120,15 @@ export class Game {
   pickups: Pickup[] = [];
   effects: Effect[] = [];
   bombsOut: Bomb[] = [];
-  player = { x: 0, y: 0, dir: 'down' as Dir, attack: 0, inv: 0, kbx: 0, kby: 0, kbT: 0, anim: 0, moving: false };
+  player = { x: 0, y: 0, dir: 'down' as Dir, inv: 0, kbx: 0, kby: 0, kbT: 0, anim: 0, moving: false };
+  /** The sword swing in progress, if any. */
+  slash: Slash | null = null;
+  private spinCd = 0;
+  private slashSign = 1;
+  /** Tapped spot to walk to (room pixels), and a person to talk to on arrival. */
+  private walkTo: { x: number; y: number } | null = null;
+  private pendingTalk: Npc | null = null;
+  private stuckT = 0;
   mode: 'play' | 'scroll' | 'fade' | 'dead' | 'inv' | 'map' = 'play';
   paused = false;
   time = 0;
@@ -130,7 +158,8 @@ export class Game {
     this.arrived();
     if (!save.flags.intro) {
       save.flags.intro = true;
-      this.say('intro');
+      // after the constructor, once main.ts has set touchMode (the intro explains how to walk)
+      queueMicrotask(() => this.say('intro'));
     }
   }
 
@@ -185,11 +214,26 @@ export class Game {
     const p = this.player;
     this.save.pos = { loc: this.room.def.loc, x: Math.round(p.x), y: Math.round(p.y), dir: p.dir };
     this.hooks.onSave(this.save);
+    this.guide.update(this.save);
   }
 
   private say(key: string, then?: () => void) {
     this.input.reset();
-    this.dialog.show(t(key, { name: this.save.name }), then);
+    this.dialog.show(this.txt(key), then);
+  }
+
+  /** Finds the way to the next goal; the arrow and the owl use it. */
+  readonly guide = new Guide();
+  /** Show the arrow that points the way (a setting). */
+  showGuide = true;
+
+  /** Playing with fingers? Then texts that mention buttons have a touch version (`key_touch`). */
+  touchMode = false;
+
+  /** A text, in its touch version when playing on a touch screen. */
+  txt(key: string): string {
+    const k = this.touchMode && hasText(`${key}_touch`) ? `${key}_touch` : key;
+    return t(k, { name: this.save.name });
   }
 
   /** Say something only once per visit to the room. */
@@ -202,12 +246,16 @@ export class Game {
   private update(dt: number) {
     this.time += dt;
     if (this.input.consume('menu')) { this.hooks.onMenu(); return; }
+    const gestures = this.input.touch.consume();
+    const taps = gestures.filter(g => g.kind === 'tap' || g.kind === 'double') as { x: number; y: number }[];
     if (this.dialog.open) {
-      if (this.input.consume('a') || this.input.consume('b')) this.dialog.advance();
+      // tap anywhere to read on
+      if (this.input.consume('a') || this.input.consume('b') || taps.length) this.dialog.advance();
       return;
     }
     this.effects = this.effects.filter(e => (e.t += dt) < e.dur);
 
+    if (this.mode === 'inv' || this.mode === 'map') for (const g of taps) this.tap(g.x, g.y);
     if (this.mode === 'inv') this.updateInventory();
     else if (this.mode === 'map') this.updateMap();
     else if (this.mode === 'scroll') this.updateScroll(dt);
@@ -216,7 +264,9 @@ export class Game {
     else {
       if (this.input.consume('inv')) { this.openInventory(); this.input.flush(); return; }
       if (this.input.consume('map')) { this.openMap(); this.input.flush(); return; }
+      this.handleGestures(gestures);
       this.updatePlayer(dt);
+      this.updateSlash(dt);
       this.updateEnemies(dt);
       this.updateShots(dt);
       this.updateBombs(dt);
@@ -238,6 +288,7 @@ export class Game {
       if (this.flag(`open:${loc}:${x},${y}`)) {
         if (ch === 'L' || ch === 'V') row[x] = def.ground;
         if (ch === 'Z' || ch === '%') row[x] = this.crackOpensTo(def, x, y, ch);
+        if (ch === 'B') row[x] = 'D'; // a bush that hid stairs
       }
       if (solved && ch === '|') row[x] = def.ground;
       if (solved && ch === 'I') row[x] = 'J';
@@ -333,7 +384,10 @@ export class Game {
 
   private enterRoom(loc: string, x: number, y: number, dir: Dir) {
     this.room = this.buildRoom(loc);
-    Object.assign(this.player, { x, y, dir, attack: 0, kbT: 0 });
+    Object.assign(this.player, { x, y, dir, kbT: 0 });
+    this.slash = null;
+    this.walkTo = null;
+    this.pendingTalk = null;
     if (this.playerBlockedAt(x, y)) this.moveToFreeTile();
     this.populate();
   }
@@ -401,7 +455,9 @@ export class Game {
     this.shots = [];
     this.pickups = [];
     this.bombsOut = [];
-    this.player.attack = 0;
+    this.slash = null;
+    this.walkTo = null;
+    this.pendingTalk = null;
   }
 
   /** Where the player stands in the new room after scrolling in direction `dir`. */
@@ -494,6 +550,7 @@ export class Game {
   private updatePlayer(dt: number) {
     const p = this.player;
     p.inv = Math.max(0, p.inv - dt);
+    this.spinCd = Math.max(0, this.spinCd - dt);
 
     if (p.kbT > 0) {
       p.kbT -= dt;
@@ -502,33 +559,188 @@ export class Game {
       p.y = clamp(p.y, -HB.oy, ROOM_H - HB.oy - HB.h);
       return;
     }
-    if (p.attack > 0) {
-      p.attack -= dt;
-      this.swordHits();
-      return;
-    }
 
     if (this.input.consume('a')) {
-      if (this.tryTalk()) return;
-      if (this.save.items.sword) { p.attack = ATTACK_TIME; play('sword'); return; }
+      if (!this.tryTalk()) this.startSlash(this.facingAngle());
     }
+    if (this.input.consume('spin')) this.startSpin();
     if (this.input.consume('b')) this.useB();
 
+    // Where to go: arrow keys, a held finger/mouse, or the spot that was tapped.
+    let mv: [number, number] | null = null;
+    let reach = Infinity;
     const d = this.input.dir;
-    p.moving = !!d;
     if (d) {
-      p.dir = d;
+      mv = DIR_VEC[d];
+      this.walkTo = null;
+      this.pendingTalk = null;
+    } else {
+      const held = this.input.touch.walkTarget(performance.now());
+      if (held) { this.walkTo = null; this.pendingTalk = null; }
+      const tgt = held ? { x: held.x, y: held.y - HUD_H } : this.walkTo;
+      if (tgt) {
+        const dx = tgt.x - (p.x + 8), dy = tgt.y - (p.y + 11);
+        reach = Math.hypot(dx, dy);
+        if (reach > 2) mv = [dx / reach, dy / reach];
+        else this.walkTo = null;
+      }
+    }
+
+    p.moving = !!mv;
+    if (mv) {
+      const [vx, vy] = mv;
+      // while swinging she keeps facing the swing
+      if (!this.slash) p.dir = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 'right' : 'left') : (vy > 0 ? 'down' : 'up');
       p.anim += dt;
-      const [vx, vy] = DIR_VEC[d];
       const speed = PLAYER_SPEED * (this.save.items.wings ? 1.3 : 1);
-      this.movePlayer(vx * speed * dt, vy * speed * dt);
+      const step = Math.min(speed * dt, reach);
+      const bx = p.x, by = p.y;
+      this.movePlayer(vx * step, vy * step);
       this.checkBump(dt);
+      // walking to a tapped spot that can't be reached: give up after a moment
+      if (this.walkTo && Math.hypot(p.x - bx, p.y - by) < step * 0.2) {
+        if ((this.stuckT += dt) > 0.35) this.walkTo = null;
+      } else this.stuckT = 0;
       if (this.save.items.wings && Math.random() < dt * 12) {
         this.effects.push({ kind: 'sparkle', x: p.x + 8 + (Math.random() - 0.5) * 8, y: p.y + 14, t: 0, dur: 0.3 });
       }
     } else this.room.pushT = 0;
+
+    if (this.pendingTalk) {
+      const n = this.pendingTalk;
+      if (Math.hypot(n.tx * TILE + 8 - (p.x + 8), n.ty * TILE + 8 - (p.y + 10)) < 28) {
+        this.pendingTalk = null;
+        this.walkTo = null;
+        this.talkTo(n);
+        return;
+      }
+      if (!this.walkTo) this.pendingTalk = null;
+    }
     this.checkDoor();
     this.checkEdges();
+  }
+
+  // ------------------------------------------------------------------ touch / mouse gestures
+  private handleGestures(gs: Gesture[]) {
+    const p = this.player;
+    for (const g of gs) {
+      if (g.kind === 'spin') { this.startSpin(); continue; }
+      if (g.y < HUD_H) {
+        if (g.kind === 'tap') this.tap(g.x, g.y);
+        continue;
+      }
+      const cx = p.x + 8, cy = p.y + 10 + HUD_H;
+      if (g.kind === 'slash') {
+        // Slash toward where the finger cut. If it cut right through her, slash along the cut.
+        const ox = g.x - cx, oy = g.y - cy;
+        const through = Math.hypot(ox, oy) < 12;
+        const angle = through ? Math.atan2(g.dy, g.dx) : Math.atan2(oy, ox);
+        // sweep the same way the finger moved
+        const cross = ox * g.dy - oy * g.dx;
+        this.startSlash(angle, through ? undefined : cross >= 0 ? 1 : -1);
+      } else if (g.kind === 'double') {
+        this.walkTo = null;
+        this.pendingTalk = null;
+        const dx = g.x - cx, dy = g.y - cy;
+        this.useB(Math.hypot(dx, dy) < 10 ? this.facingAngle() : Math.atan2(dy, dx));
+      } else {
+        this.tapRoom(g.x, g.y - HUD_H);
+      }
+    }
+  }
+
+  /** A tap in the room: talk to a person you tapped (walking there first), or walk to the spot. */
+  private tapRoom(x: number, y: number) {
+    const p = this.player;
+    const n = this.room.npcs.find(n => Math.abs(n.tx * TILE + 8 - x) < 13 && Math.abs(n.ty * TILE + 8 - y) < 13);
+    if (n) {
+      if (Math.hypot(n.tx * TILE + 8 - (p.x + 8), n.ty * TILE + 8 - (p.y + 10)) < 28) { this.talkTo(n); return; }
+      this.pendingTalk = n;
+      // stand just below (or above) the person
+      const below = !isSolid(this.room.tiles[n.ty + 1]?.[n.tx] ?? '#');
+      this.walkTo = { x: n.tx * TILE + 8, y: (n.ty + (below ? 1 : -1)) * TILE + 11 };
+      return;
+    }
+    this.walkTo = { x, y };
+    this.stuckT = 0;
+    this.effects.push({ kind: 'sparkle', x, y, t: 0, dur: 0.35 });
+  }
+
+  private facingAngle() {
+    const [vx, vy] = DIR_VEC[this.player.dir];
+    return Math.atan2(vy, vx);
+  }
+
+  private faceAngle(a: number) {
+    const vx = Math.cos(a), vy = Math.sin(a);
+    this.player.dir = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 'right' : 'left') : (vy > 0 ? 'down' : 'up');
+  }
+
+  // ------------------------------------------------------------------ the sword
+  private startSlash(angle: number, sign?: number) {
+    if (!this.save.items.sword) return;
+    if (this.slash && (this.slash.spin || this.slash.t < SLASH_TIME * 0.5)) return;
+    this.slashSign = sign ?? -this.slashSign;
+    this.slash = { angle, sign: this.slashSign, spin: false, t: 0, prevK: 0, hit: new Set() };
+    this.faceAngle(angle);
+    play('sword');
+  }
+
+  /** Spin attack: the sword goes all the way round and bats shots back. */
+  private startSpin() {
+    if (!this.save.items.sword || this.spinCd > 0) return;
+    this.slash = { angle: this.facingAngle() - Math.PI, sign: 1, spin: true, t: 0, prevK: 0, hit: new Set() };
+    this.spinCd = SPIN_COOLDOWN + SPIN_TIME;
+    play('sword');
+    play('boomerang');
+  }
+
+  /** Bushes can be cut down (not the ones on the screen's border, so edges stay as they are). */
+  private cutBush(tx: number, ty: number) {
+    const r = this.room;
+    if (tx < 1 || ty < 1 || tx >= COLS - 1 || ty >= ROWS - 1 || r.tiles[ty][tx] !== 'B') return;
+    const door = r.def.doors.some(d => d.tx === tx && d.ty === ty);
+    r.tiles[ty][tx] = door ? 'D' : r.def.ground;
+    this.repaint();
+    play(door ? 'secret' : 'cut');
+    this.effects.push({ kind: 'leaves', x: tx * TILE + 8, y: ty * TILE + 8, t: 0, dur: 0.45 });
+    if (door) {
+      this.save.flags[`open:${r.def.loc}:${tx},${ty}`] = true;
+      this.persist();
+      return;
+    }
+    const roll = Math.random();
+    const drop = roll < 0.12 ? '$' : roll < 0.22 ? 'h' : null;
+    if (drop) this.pickups.push({ ch: drop, x: tx * TILE, y: ty * TILE, life: 8 });
+  }
+
+  /** Blade angle at progress k (0..1) of the swing. */
+  private bladeAngle(sl: Slash, k: number) {
+    return sl.spin ? sl.angle + sl.sign * Math.PI * 2 * k : sl.angle + sl.sign * SLASH_ARC * (k - 0.5);
+  }
+
+  private updateSlash(dt: number) {
+    const sl = this.slash;
+    if (!sl) return;
+    sl.t += dt;
+    const k = Math.min(1, sl.t / (sl.spin ? SPIN_TIME : SLASH_TIME));
+    const p = this.player;
+    const cx = p.x + 8, cy = p.y + 10;
+    // check a few blade positions between last frame and now, so fast swings don't skip enemies
+    for (let i = 1; i <= 3; i++) {
+      const a = this.bladeAngle(sl, sl.prevK + ((k - sl.prevK) * i) / 3);
+      for (const r of sl.spin ? SPIN_BLADE : BLADE) {
+        const pt = { x: cx + Math.cos(a) * r - 1, y: cy + Math.sin(a) * r - 1, w: 2, h: 2 };
+        this.cutBush(Math.floor((pt.x + 1) / TILE), Math.floor((pt.y + 1) / TILE));
+        for (const e of this.enemies) {
+          if (e.spawn > 0 || e.hidden || sl.hit.has(e) || !overlap(pt, this.enemyBox(e))) continue;
+          sl.hit.add(e);
+          this.damageEnemy(e, 1, cx, cy);
+        }
+      }
+    }
+    sl.prevK = k;
+    if (k >= 1) this.slash = null;
   }
 
   /** The B item that is actually usable: falls back to another one you own. */
@@ -538,9 +750,11 @@ export class Game {
     return B_ITEMS.find(i => s.items[i]) ?? null;
   }
 
-  private useB() {
+  /** Use the B item toward `angle` (radians); defaults to the way she faces. */
+  private useB(angle = this.facingAngle()) {
     const p = this.player;
-    const [vx, vy] = DIR_VEC[p.dir];
+    const vx = Math.cos(angle), vy = Math.sin(angle);
+    this.faceAngle(angle);
     switch (this.bItem()) {
       case 'staff':
         if (this.shots.some(s => s.kind === 'magic')) return;
@@ -697,6 +911,12 @@ export class Game {
   }
 
   private talkTo(n: Npc) {
+    // The owl always knows what to do next.
+    if (n.kind === 'owl') {
+      this.guide.update(this.save);
+      this.say(this.guide.goal ? `goal_${this.guide.goal.id}` : 'goal_done');
+      return;
+    }
     const def = this.room.def;
     const all = [...def.items, ...def.rewards].filter(i => i.ch !== '0');
     const allTaken = all.length > 0 && all.every(i => this.flag(`got:${def.loc}:${i.tx},${i.ty}`));
@@ -705,32 +925,11 @@ export class Game {
     this.say(n.text);
   }
 
-  private swordBox(): Box | null {
-    const p = this.player;
-    if (p.attack <= 0.04 || p.attack > ATTACK_TIME - 0.03) return null;
-    switch (p.dir) {
-      case 'up': return { x: p.x + 4, y: p.y - 12, w: 8, h: 16 };
-      case 'down': return { x: p.x + 4, y: p.y + 12, w: 8, h: 16 };
-      case 'left': return { x: p.x - 12, y: p.y + 5, w: 16, h: 9 };
-      case 'right': return { x: p.x + 12, y: p.y + 5, w: 16, h: 9 };
-    }
-  }
-
-  private swordHits() {
-    const sb = this.swordBox();
-    if (!sb) return;
-    for (const e of this.enemies) {
-      if (e.spawn > 0 || e.hurt > 0 || e.hidden) continue;
-      if (overlap(sb, this.enemyBox(e))) this.damageEnemy(e, 1, this.player.x + 8, this.player.y + 10);
-    }
-  }
-
   private hurtPlayer(dmg: number, fromX: number, fromY: number) {
     const p = this.player;
     if (p.inv > 0 || this.mode !== 'play' || this.god) return;
     this.save.hp -= dmg;
     p.inv = 1.3;
-    p.attack = 0;
     let dx = p.x + 8 - fromX, dy = p.y + 10 - fromY;
     const len = Math.hypot(dx, dy) || 1;
     dx /= len; dy /= len;
@@ -1006,16 +1205,13 @@ export class Game {
           this.effects.push({ kind: 'sparkle', x: s.x, y: s.y, t: 0, dur: 0.3 });
           continue;
         }
+      } else if (this.swordReflects(s)) {
+        this.reflect(s);
+        keep.push(s);
+        continue;
       } else if (overlap(box, pb)) {
         if (this.shieldBlocks(s)) {
-          // bounce it back: now it is hers and hurts enemies like magic
-          s.friendly = true;
-          s.vx = -s.vx * 1.3;
-          s.vy = -s.vy * 1.3;
-          s.dmg = s.kind === 'orb' ? 1 : 2;
-          s.life = s.kind === 'orb' ? 4 : 2;
-          play('clang');
-          this.effects.push({ kind: 'sparkle', x: s.x, y: s.y, t: 0, dur: 0.3 });
+          this.reflect(s);
           keep.push(s);
           continue;
         }
@@ -1025,6 +1221,33 @@ export class Game {
       keep.push(s);
     }
     this.shots = keep;
+  }
+
+  /** Is an enemy shot inside the sword's swing? Slashes cover their arc, the spin covers all round. */
+  private swordReflects(s: Shot): boolean {
+    const sl = this.slash;
+    // The Star Eater's star ball can only be bounced with the shield (that's the point of the shield).
+    if (!sl || s.kind === 'orb') return false;
+    const dx = s.x - (this.player.x + 8), dy = s.y - (this.player.y + 10);
+    const d = Math.hypot(dx, dy);
+    if (sl.spin) return d < SPIN_REACH;
+    if (d > BLADE[BLADE.length - 1] + 4) return false;
+    let off = Math.atan2(dy, dx) - sl.angle;
+    while (off > Math.PI) off -= Math.PI * 2;
+    while (off < -Math.PI) off += Math.PI * 2;
+    // a little extra margin so a close shot isn't missed between frames
+    return Math.abs(off) <= SLASH_ARC / 2 + 0.3;
+  }
+
+  /** Bounce an enemy shot back (sword or shield): now it is hers and hurts enemies like magic. */
+  private reflect(s: Shot) {
+    s.friendly = true;
+    s.vx = -s.vx * 1.3;
+    s.vy = -s.vy * 1.3;
+    s.dmg = s.kind === 'orb' ? 1 : 2;
+    s.life = s.kind === 'orb' ? 4 : 2;
+    play('clang');
+    this.effects.push({ kind: 'sparkle', x: s.x, y: s.y, t: 0, dur: 0.3 });
   }
 
   /** A bounced star ball curves toward the Star Eater, so a young player doesn't have to aim. */
@@ -1042,7 +1265,7 @@ export class Game {
   /** With the shield, shots coming at her face bounce off (not while swinging the sword). */
   private shieldBlocks(s: Shot): boolean {
     const p = this.player;
-    if (!this.save.items.shield || p.attack > 0 || this.mode !== 'play') return false;
+    if (!this.save.items.shield || this.slash || this.mode !== 'play') return false;
     const [dx, dy] = DIR_VEC[p.dir];
     const inFront = (s.x - (p.x + 8)) * dx + (s.y - (p.y + 10)) * dy > -2;
     const towardHer = s.vx * dx + s.vy * dy < 0;
@@ -1182,7 +1405,7 @@ export class Game {
     this.effects.push({ kind: 'sparkle', x: pk.x + 8, y: pk.y + 8, t: 0, dur: 0.4 });
     if (pk.flag) s.flags[pk.flag] = true;
     this.persist();
-    const lines = msgs.map(k => t(k, { name: s.name })).filter(x => !/^NEXT_/.test(x));
+    const lines = msgs.filter(k => hasText(k)).map(k => this.txt(k));
     if (lines.length) {
       this.input.reset();
       this.dialog.show(lines.join('|'), then);
@@ -1363,6 +1586,8 @@ export class Game {
       this.drawPlayer(g, p.x, p.y);
     }
     for (const e of this.effects) this.drawEffect(g, e);
+    this.drawGuideArrow(g);
+    this.drawTrails(g);
   }
 
   /** People. Outdoor friends bob a little and show a speech bubble to invite a chat. */
@@ -1394,7 +1619,7 @@ export class Game {
     const p = this.player;
     let dir = p.dir;
     if (this.mode === 'dead') dir = DIRS[[1, 3, 0, 2][Math.floor(this.time * 10) % 4]];
-    const walking = (p.moving || this.mode === 'scroll') && p.attack <= 0;
+    const walking = (p.moving || this.mode === 'scroll') && !this.slash;
     const frame = walking ? Math.floor(p.anim * 8) % 2 : 0;
     if (this.save.items.wings) {
       const flap = Math.floor(this.time * 6) % 2;
@@ -1423,21 +1648,91 @@ export class Game {
     }
   }
 
+  /** The swinging sword plus a white swoosh along the arc it has swept. */
   private drawSword(g: CanvasRenderingContext2D) {
+    const sl = this.slash;
+    if (!sl) return;
     const p = this.player;
-    if (p.attack <= 0) return;
+    const cx = p.x + 8, cy = p.y + 10;
+    const k = Math.min(1, sl.t / (sl.spin ? SPIN_TIME : SLASH_TIME));
+    // swoosh
+    const steps = sl.spin ? 18 : 9;
+    for (let i = 0; i <= steps; i++) {
+      const kk = (k * i) / steps;
+      const a = this.bladeAngle(sl, kk);
+      const fade = 1 - (k - kk) * (sl.spin ? 1.2 : 2.5);
+      if (fade <= 0) continue;
+      g.globalAlpha = fade * 0.8;
+      g.fillStyle = sl.spin ? '#bfe4ff' : '#ffffff';
+      for (const r of sl.spin ? [22, 26] : [18, 22]) g.fillRect(Math.round(cx + Math.cos(a) * r) - 1, Math.round(cy + Math.sin(a) * r) - 1, 2, 2);
+    }
+    g.globalAlpha = 1;
+    // the sword itself, pointing outward
+    const a = this.bladeAngle(sl, k);
     const img = art.item['1'];
-    const pos: Record<Dir, [number, number, number]> = {
-      up: [p.x + 8, p.y - 3, 0],
-      down: [p.x + 8, p.y + 21, Math.PI],
-      right: [p.x + 21, p.y + 10, Math.PI / 2],
-      left: [p.x - 5, p.y + 10, -Math.PI / 2],
-    };
-    const [cx, cy, ang] = pos[p.dir];
     g.save();
-    g.translate(Math.round(cx), Math.round(cy));
-    g.rotate(ang);
+    const r = sl.spin ? 17 : 14;
+    g.translate(Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r));
+    g.rotate(a + Math.PI / 2);
     g.drawImage(img, -Math.floor(img.width / 2), -Math.floor(img.height / 2));
+    g.restore();
+  }
+
+  /** A bobbing arrow that shows the way to the next goal (overworld only). */
+  private drawGuideArrow(g: CanvasRenderingContext2D) {
+    const def = this.room.def;
+    if (!this.showGuide || def.kind !== 'ow' || this.mode !== 'play') return;
+    const p = this.player;
+    const ptr = this.guide.pointer(def.gx, def.gy, Math.floor((p.x + 8) / TILE), Math.floor((p.y + 11) / TILE));
+    if (!ptr) return;
+    const bob = Math.sin(this.time * 6) * 2;
+    let x = ptr.tx * TILE + 8, y = ptr.ty * TILE + 8;
+    let dx = 0, dy = 1;
+    if (ptr.out) {
+      [dx, dy] = ptr.out;
+      // sit at the very edge of the screen, pointing out
+      x = clamp(x + dx * 6, 6, ROOM_W - 6);
+      y = clamp(y + dy * 6, 6, ROOM_H - 6);
+    } else {
+      // above the goal, pointing down at it
+      y -= 14;
+      if (y < 6) { y += 28; dy = -1; }
+    }
+    this.drawArrow(g, Math.round(x + dx * bob), Math.round(y + dy * bob), dx, dy);
+  }
+
+  private drawArrow(g: CanvasRenderingContext2D, x: number, y: number, dx: number, dy: number) {
+    // rows of the arrow pointing down; rotated by swapping axes
+    const rows = [[-1, 1, 2], [-1, 1, 2], [-4, 4, 1], [-3, 3, 1], [-2, 2, 1], [-1, 1, 1]];
+    const put = (u: number, v: number, w: number, h: number, c: string) => {
+      g.fillStyle = c;
+      if (dy) g.fillRect(x + u, y + (dy > 0 ? v : -v - h), w, h);
+      else g.fillRect(x + (dx > 0 ? v : -v - h), y + u, h, w);
+    };
+    let v = -6;
+    for (const [a, b, h] of rows) { put(a - 1, v - 1, b - a + 2, h + 2, '#3a2a00'); v += h; }
+    v = -6;
+    for (const [a, b, h] of rows) { put(a, v, b - a, h, Math.floor(this.time * 4) % 2 ? '#ffe14d' : '#fff3a0'); v += h; }
+  }
+
+  /** The white streak behind a swiping finger, like slicing fruit. */
+  private drawTrails(g: CanvasRenderingContext2D) {
+    const now = performance.now();
+    g.save();
+    g.lineCap = 'round';
+    g.lineJoin = 'round';
+    g.strokeStyle = '#ffffff';
+    for (const pts of this.input.touch.trails(now)) {
+      for (let i = 1; i < pts.length; i++) {
+        const age = (now - pts[i].t) / 140;
+        g.globalAlpha = Math.max(0, 0.9 - age);
+        g.lineWidth = 3.5 * (1 - age * 0.6);
+        g.beginPath();
+        g.moveTo(pts[i - 1].x, pts[i - 1].y - HUD_H);
+        g.lineTo(pts[i].x, pts[i].y - HUD_H);
+        g.stroke();
+      }
+    }
     g.restore();
   }
 
@@ -1554,6 +1849,13 @@ export class Game {
       for (let i = 0; i < 4; i++) {
         const a = Math.PI / 4 + (i * Math.PI) / 2;
         g.fillRect(Math.round(e.x + Math.cos(a) * r) - 2, Math.round(e.y + Math.sin(a) * r) - 2, 4, 4);
+      }
+    } else if (e.kind === 'leaves') {
+      const r = 2 + 10 * k;
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3 + k;
+        g.fillStyle = i % 2 ? '#3f9f45' : '#6cc96a';
+        g.fillRect(Math.round(e.x + Math.cos(a) * r) - 1, Math.round(e.y + Math.sin(a) * r + k * 4) - 1, 3, 2);
       }
     } else if (e.kind === 'boom') {
       const r = 6 + 22 * k;

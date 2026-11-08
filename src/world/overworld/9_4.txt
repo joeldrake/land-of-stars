@@ -1,12 +1,12 @@
-// Overworld 9,4 - meadow
+// Overworld 9,4 - the bush maze (cut your way in!)
 TTB...BTTBTTBBBT
 TTB...BBBBBTBTTB
-T..BB.........TT
-....FF........BT
-..BB....b.....BB
-..........TT..BB
-B.B.............
-T.........BB....
-B.......T.......
+T..B.......B..TT
+....B.BBBB.B..BT
+..B.B.B$$B.B..BB
+....B.B$$B....BB
+B.B.B.BB.B.BB...
+T...B......B....
+B...BBBB.BBB....
 T.............TB
 BTTTBB....BBBBBB

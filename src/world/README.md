@@ -16,7 +16,7 @@ src/world/dungeons/<id>/<x>_<y>.txt borgar, ett rum per fil, rummen ligger i ett
 | `,` | sand | | `b` | fladdermus |
 | `F` | blommor (går att gå på) | | `g` | troll som kastar sten |
 | `T` | träd | | `k` | skelett |
-| `B` | buske | | `c` | krabba (går i sidled) |
+| `B` | buske (går att hugga ner om den inte står i skärmens kant; `@door` under = hemlig trappa) | | `c` | krabba (går i sidled) |
 | `R` | sten | | `z` | spöke (bleknar bort ibland) |
 | `M` | klippa | | `v` | gnista (studsar snett) |
 | `W` | vatten (magi och bumerang flyger över) | | `X` | borgens boss, 2×2 rutor (se nedan) |

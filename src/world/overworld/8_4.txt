@@ -1,12 +1,12 @@
-// Overworld 8,4 - meadow
+// Overworld 8,4 - the wishing fountain (gems in the water: try the boomerang)
 TTBTB..BTTBTTTTB
 BB.............T
-TB.g...........T
-BB..............
-BB.......FF.B...
-TB..............
-BT......B......T
-TT.............B
+TB.g....F......T
+BB...S......S...
+BB.....WW.......
+TB....W$$W......
+BT.....WW......T
+TT...S......S..B
 TB.............B
 TBTTBTBBBTBBBTBT
 BTBTBBTBBTBBTTBB

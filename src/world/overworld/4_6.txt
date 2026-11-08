@@ -1,12 +1,12 @@
-// Overworld 4,6 - plains
+// Overworld 4,6 - the old ruin
 TT....TTTTTTTTTT
 TT....TTTTTTTTTT
 TT..BBF.BT....TT
 ................
-....BB..........
-................
-TT............TT
-TT..........F.TT
-TT....g.......TT
+,,,,BB.,,,,,,,,,
+...,...,........
+TT.,,,,,.C.CC.TT
+TT.......C$..CTT
+TT....g..CS.$CTT
 TTTTTTTTTTTTTTTT
 TTTTTTTTTTTTTTTT

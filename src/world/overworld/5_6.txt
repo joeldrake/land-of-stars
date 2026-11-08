@@ -1,13 +1,13 @@
 // Overworld 5,6 - plains
 @door 4,2 -> cave:hint 7,9
-TTT....TTTTTTTTT
-TTTMMM.TTTTTTTTT
-T..MDM.F.BB.FF.T
-.............F.T
-............B..T
-................
-T.....T.........
-T..BF...T.......
-T.FF...TT......T
-T..............T
-TTTTTTTTT...TTTT
+TTT...,TTTTTTTTT
+TTTMMM,TTTTTTTTT
+T..MDM,F.BB.FF.T
+....,.,......F.T
+,,,,,,,,,,,.B..T
+..........,.....
+T.....T...,.....
+T..BF...T.,.....
+T.FF...TT.,....T
+T.........,....T
+TTTTTTTTT.,.TTTT

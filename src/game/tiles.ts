@@ -39,7 +39,7 @@ export function blocksShot(ch: string): boolean {
 /** Tiles you walk into to go somewhere (caves, stairs, house doors). */
 export const DOOR_CHARS = 'DO';
 /** Tiles that hide a door until they are bombed or pushed away. */
-export const HIDDEN_DOOR_CHARS = 'ZP%';
+export const HIDDEN_DOOR_CHARS = 'ZP%B';
 
 export const ENEMY_CHARS = 'sbgkXczv';
 export const ITEM_CHARS = 'KH123456789*h$0';

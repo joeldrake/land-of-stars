@@ -1,12 +1,12 @@
-// Overworld 11,6 - meadow
+// Overworld 11,6 - the flower meadow
 BBTTTBTTTT....BT
 BTBTBBTBTT....BB
-B..F...........T
-B...FF..FF.....T
-B...s...........
+B..F.F.F.F.F...T
+B.F.F.F$F.F.F..T
+B..F.F.F.F.F....
 B...............
-T.......TT.....B
-T........TBB...T
-T..........F...B
+T..F.F.FTT.F.F.B
+T.F.F.F.$BB.F..T
+T..F.F.F...F...B
 TBTB...BTBBBBBBT
 BTTB...BBBTTTBBT

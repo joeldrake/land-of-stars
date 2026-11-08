@@ -1,9 +1,9 @@
 // Overworld 2,7 - forest
-TTTTTTTTT...TTTT
-TTTTTTTTT...TTTT
-..BB..T.......TT
-........TT......
-................
+TTTTTTTTT.,.TTTT
+TTTTTTTTT.,.TTTT
+..BB..T...,...TT
+........TT,.....
+..........,,,,,,
 T...T...........
 T...TTT...b...TT
 T.TT....T.B...TT

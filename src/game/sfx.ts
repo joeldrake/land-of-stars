@@ -109,6 +109,7 @@ const sounds = {
   /** Something hidden appeared: a short rising jingle. */
   secret: () => melody([[N.G5, 0.1], [N.B5, 0.1], [N.D5 * 2, 0.1], [N.G6, 0.3]], 'square', 0.25),
   menu: () => { tone(660, 0, 0.05, 'square', 0.2); },
+  cut: () => { noise(0, 0.12, 0.3, 5000, 1500); },
 };
 
 export type Sound = keyof typeof sounds;

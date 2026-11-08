@@ -29,18 +29,24 @@ setLang(settings.lang);
 sfxState.enabled = settings.sound;
 
 const input = new Input();
-input.bindDpad($('dpad'));
-input.bindButton($('btn-a'), 'a');
-input.bindButton($('btn-b'), 'b');
-input.bindButton($('btn-inv'), 'inv');
 $('btn-menu').addEventListener('click', () => openSettings());
 
-// Taps on the game screen: the mini map opens the big map, the item boxes open the bag.
-canvas.addEventListener('pointerdown', e => {
-  if (!game || screen !== 'game') return;
+// Touch and mouse on the game screen: hold to walk, swipe to slash, circle to spin,
+// double tap for the B item, tap people/HUD. The gestures are worked out in game/touch.ts.
+const toGame = (e: PointerEvent): [number, number] => {
   const r = canvas.getBoundingClientRect();
-  game.tap(((e.clientX - r.left) / r.width) * VIEW_W, ((e.clientY - r.top) / r.height) * VIEW_H);
+  return [((e.clientX - r.left) / r.width) * VIEW_W, ((e.clientY - r.top) / r.height) * VIEW_H];
+};
+canvas.addEventListener('pointerdown', e => {
+  if (!game || screen !== 'game' || e.button > 0) return;
+  e.preventDefault();
+  try { canvas.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+  input.touch.down(e.pointerId, ...toGame(e), e.timeStamp);
 });
+canvas.addEventListener('pointermove', e => input.touch.move(e.pointerId, ...toGame(e), e.timeStamp));
+canvas.addEventListener('pointerup', e => input.touch.up(e.pointerId, ...toGame(e), e.timeStamp));
+canvas.addEventListener('pointercancel', e => input.touch.cancel(e.pointerId));
+canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 const dialog = new Dialog($('dialog'), $('dialog-text'), $('dialog-speak'));
 const saves = new SaveManager();
@@ -52,20 +58,15 @@ let settingsFrom: 'title' | 'game' = 'title';
 const isTouch = () => document.body.classList.contains('touch');
 if (matchMedia('(pointer: coarse)').matches) document.body.classList.add('touch');
 addEventListener('pointerdown', e => {
-  if (e.pointerType === 'touch' && !isTouch()) { document.body.classList.add('touch'); fit(); }
+  if (e.pointerType === 'touch' && !isTouch()) { document.body.classList.add('touch'); if (game) game.touchMode = true; }
 }, { capture: true });
 
 const app = $('app');
 function fit() {
   // Leave out the safe areas (iPhone notch / home bar) that #app pads away.
   const cs = getComputedStyle(app);
-  let w = innerWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  let h = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-  if (isTouch()) {
-    if (h >= w) h *= 0.6;
-    // landscape: keep room for the controls on both sides (matches the sizes in style.css)
-    else w -= 2 * Math.min(190, w * 0.2);
-  }
+  const w = innerWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const h = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const s = Math.min(w / VIEW_W, h / VIEW_H);
   frame.style.width = `${Math.floor(VIEW_W * s)}px`;
   frame.style.height = `${Math.floor(VIEW_H * s)}px`;
@@ -171,6 +172,8 @@ function startGame(fresh: boolean) {
     onSave: s => saves.save(s),
     onMenu: () => openSettings(),
   });
+  game.touchMode = isTouch();
+  game.showGuide = settings.guide;
   input.enabled = true;
   input.reset();
   game.start();
@@ -225,6 +228,11 @@ function renderSettings() {
       btn(on ? t('on') : t('off'), () => {
         settings.sound = on; sfxState.enabled = on; storeSettings(settings); renderSettings();
       }, settings.sound === on ? 'selected' : ''))),
+    h('h2', {}, [t('guide')]),
+    h('div', { class: 'row' }, [true, false].map(on =>
+      btn(on ? t('on') : t('off'), () => {
+        settings.guide = on; storeSettings(settings); if (game) game.showGuide = on; renderSettings();
+      }, settings.guide === on ? 'selected' : ''))),
     h('h2', {}, [t('name')]),
     nameInput,
     h('h2', {}, [t('cloud')]),

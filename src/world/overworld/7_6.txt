@@ -1,12 +1,12 @@
-// Overworld 7,6 - plains
+// Overworld 7,6 - the flower star (a heart in the middle)
 TTTTTTTTTTTTTTTT
 T..............T
-T...sF.........T
-T.....B..F.....T
-T..............T
-T..........F...T
-T..............T
-....sB.........T
-....B.....TT...T
+T......F.......T
+T.....FFF......T
+T.FFFFFhFFFFF..T
+T...FFFFFFF....T
+T....FF.FF.....T
+....FF...FF....T
+...FF..s..FF...T
 T..............T
 TTTTT....TTTTTTT

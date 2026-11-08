@@ -1,6 +1,8 @@
+import { HUD_H } from '../config';
+import { Touch } from './touch';
 import type { Dir } from './types';
 
-export type Btn = 'a' | 'b' | 'menu' | 'inv' | 'map';
+export type Btn = 'a' | 'b' | 'spin' | 'menu' | 'inv' | 'map';
 
 const KEY_DIR: Record<string, Dir> = {
   ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
@@ -9,17 +11,19 @@ const KEY_DIR: Record<string, Dir> = {
 const KEY_BTN: Record<string, Btn> = {
   Space: 'a', KeyJ: 'a', KeyZ: 'a', Enter: 'a',
   KeyX: 'b', KeyK: 'b',
+  KeyQ: 'spin', ShiftLeft: 'spin', ShiftRight: 'spin',
   KeyI: 'inv', KeyC: 'inv', Tab: 'inv', KeyM: 'map',
   Escape: 'menu', KeyP: 'menu',
 };
 
-/** Keyboard + on-screen touch controls, merged into one 4-way direction and button presses. */
+/** Keyboard (arrows + buttons) and touch/mouse gestures on the game screen (`touch`). */
 export class Input {
   /** When false (menus open) keys are left alone so buttons/inputs work normally. */
   enabled = false;
   private stack: Dir[] = [];
-  private touchDir: Dir | null = null;
   private pressed = new Set<Btn>();
+  /** Swipes, taps and held fingers on the game screen. */
+  readonly touch = new Touch(HUD_H);
   /** Direction presses since the last frame, so menus never miss a quick tap. */
   private dirTaps: Dir[] = [];
 
@@ -48,7 +52,7 @@ export class Input {
 
   /** Most recently pressed direction wins, like on a real d-pad. */
   get dir(): Dir | null {
-    return this.touchDir ?? this.stack[this.stack.length - 1] ?? null;
+    return this.stack[this.stack.length - 1] ?? null;
   }
 
   consume(b: Btn): boolean {
@@ -67,52 +71,8 @@ export class Input {
 
   reset() {
     this.stack = [];
-    this.touchDir = null;
     this.pressed.clear();
     this.dirTaps = [];
-  }
-
-  bindDpad(el: HTMLElement) {
-    let id: number | null = null;
-    const update = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      if (Math.hypot(dx, dy) < r.width * 0.1) this.touchDir = null;
-      else {
-        const d: Dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-        if (d !== this.touchDir) this.dirTaps.push(d);
-        this.touchDir = d;
-      }
-      el.dataset.dir = this.touchDir ?? '';
-    };
-    const end = (e: PointerEvent) => {
-      if (e.pointerId !== id) return;
-      id = null;
-      this.touchDir = null;
-      el.dataset.dir = '';
-    };
-    el.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      id = e.pointerId;
-      try { el.setPointerCapture(id); } catch { /* pointer already gone */ }
-      update(e);
-    });
-    el.addEventListener('pointermove', e => { if (e.pointerId === id) update(e); });
-    el.addEventListener('pointerup', end);
-    el.addEventListener('pointercancel', end);
-    el.addEventListener('lostpointercapture', end);
-  }
-
-  bindButton(el: HTMLElement, b: Btn) {
-    el.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      this.pressed.add(b);
-      el.classList.add('down');
-    });
-    const up = () => el.classList.remove('down');
-    el.addEventListener('pointerup', up);
-    el.addEventListener('pointercancel', up);
-    el.addEventListener('pointerleave', up);
+    this.touch.reset();
   }
 }

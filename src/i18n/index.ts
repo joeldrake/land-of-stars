@@ -17,6 +17,9 @@ export function setLang(l: Lang) {
 export const getLang = () => lang;
 export const speechLang = () => (lang === 'sv' ? 'sv-SE' : 'en-US');
 
+/** Is there a text with this key? */
+export const hasText = (key: string) => key in dicts[lang] || key in dicts.sv;
+
 export function t(key: string, params: Record<string, string | number> = {}): string {
   let s = dicts[lang][key] ?? dicts.sv[key] ?? key;
   for (const [k, v] of Object.entries(params)) s = s.replaceAll(`{${k}}`, String(v));

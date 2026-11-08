@@ -7,6 +7,6 @@ TTTTT.T...T....T
 TT.............T
 TTTBB..........T
 TT...BBB...T....
-TT.B......TT....
-TT.............T
-TTTTTTTTT....TTT
+TT.B......TT,,,,
+TT..........,..T
+TTTTTTTTT.,,,TTT

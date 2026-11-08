@@ -72,7 +72,8 @@ export function normalizeSave(raw: unknown): SaveData | null {
     keys,
     bombs: typeof r.bombs === 'number' ? r.bombs : 0,
     bItem: B_ITEMS.includes(r.bItem as BItem) ? (r.bItem as BItem) : 'staff',
-    items: { ...base.items, ...(r.items ?? {}) },
+    // the map now comes with the sword; older saves that have the sword get it too
+    items: { ...base.items, ...(r.items ?? {}), ...(r.items?.sword ? { map: true } : {}) },
     flags: { ...(r.flags ?? {}) },
     stars: Array.isArray(r.stars) ? r.stars : [],
     pos: r.pos && typeof r.pos.loc === 'string' ? r.pos : base.pos,

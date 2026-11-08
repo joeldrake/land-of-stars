@@ -52,6 +52,12 @@ function drawMiniMap(g: G, game: Game) {
   g.fillRect(x0, y0, w, h);
   if (def.kind === 'ow') {
     const cw = w / OW_COLS, ch = h / OW_ROWS;
+    const goal = game.guide.goal;
+    if (goal && game.showGuide && Math.floor(game.time * 3) % 2 === 0) {
+      const [gx, gy] = goal.loc.split(':').slice(1).map(Number);
+      g.fillStyle = '#ffe14d';
+      g.fillRect(x0 + gx * cw, y0 + gy * ch + 0.5, cw - 1, ch - 1);
+    }
     g.fillStyle = '#7cff5a';
     g.fillRect(x0 + def.gx * cw, y0 + def.gy * ch + 0.5, cw - 1, ch - 1);
   } else if (def.kind === 'dungeon') {
@@ -174,7 +180,7 @@ export function drawInventory(g: G, game: Game) {
   g.font = 'bold 8px monospace';
   if (owns(game, slot)) {
     const isB = slot === 'staff' || slot === 'bombs' || slot === 'boomerang';
-    const hint = isB ? t('inv_pick') : slot === 'map' ? t('inv_map') : slot === 'sword' ? t('inv_sword') : t('inv_info');
+    const hint = game.txt(isB ? 'inv_pick' : slot === 'map' ? 'inv_map' : slot === 'sword' ? 'inv_sword' : 'inv_info');
     centerText(g, hint, 144, '#aaa');
   }
 }
@@ -254,6 +260,17 @@ export function drawWorldMap(g: G, game: Game) {
   const here = def.kind === 'ow'
     ? [def.gx * COLS + Math.floor((game.player.x + 8) / 16), def.gy * ROWS + Math.floor((game.player.y + 11) / 16)]
     : owSpot(def.loc);
+  // the next goal: a big blinking star with a ring around it
+  const goal = game.guide.goal;
+  if (goal) {
+    const [gx, gy] = goal.loc.split(':').slice(1).map(Number);
+    const x = ox + gx * COLS + goal.tx, y = oy + gy * ROWS + goal.ty;
+    const r = 5 + Math.floor(game.time * 6) % 3;
+    g.strokeStyle = '#ffe14d';
+    g.lineWidth = 1;
+    g.strokeRect(x - r + 0.5, y - r + 0.5, r * 2, r * 2);
+    g.drawImage(art.item['*'], x - 5, y - 5);
+  }
   if (here && Math.floor(game.time * 4) % 2 === 0) {
     g.fillStyle = '#ff3a5a';
     g.fillRect(ox + here[0] - 2, oy + here[1] - 2, 5, 5);
@@ -265,8 +282,14 @@ export function drawWorldMap(g: G, game: Game) {
   g.fillRect(40, ly, 5, 5);
   g.fillStyle = '#fff';
   g.fillText(t('map_you'), 50, ly - 1);
-  g.drawImage(art.item['*'], 140, ly - 3);
-  g.fillText(t('map_castle'), 155, ly - 1);
+  g.drawImage(art.item['*'], 110, ly - 3);
+  g.fillText(t('map_castle'), 125, ly - 1);
+  if (goal) {
+    g.strokeStyle = '#ffe14d';
+    g.strokeRect(180.5, ly - 2.5, 7, 7);
+    g.fillStyle = '#ffe14d';
+    g.fillText(t('map_goal'), 192, ly - 1);
+  }
   g.fillStyle = '#aaa';
   centerText(g, t('map_close'), ROOM_H - 20, '#aaa');
 }

@@ -1,10 +1,10 @@
-// Overworld 6,5 - plains
+// Overworld 6,5 - the stone circle (gems around the statue)
 TTTTTTTT...TTTTT
-T..............T
-T.......F......T
-T..........s...T
-T..s...B.......T
-T........B.FF...
+T..RRR.........T
+T.R.$.R........T
+T.R.S.R..F.....T
+T.R$.$R........T
+T..R.R..........
 T...............
 ................
 ............g..T

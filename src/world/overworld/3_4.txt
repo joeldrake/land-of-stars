@@ -1,12 +1,14 @@
 // Overworld 3,4 - meadow
-TT..TTBTBTBBBTTB
-T..............T
-B...........b..T
-T.BB....TTBFF..B
+@npc 8,6 owl owl
+@npc 13,4 sign sign_graves
+TT,.TTBTBTBBBTTB
+T.,,,..........T
+B...,.......b..T
+T.BB,...TTBFF..B
 B..FF.B.........
-B...............
+B...,,,,,,,,....
 B..........b...B
-B........BB....B
-B...F.g........T
-BBTTBBTBT....TTT
-TTTBTTBBT....BTT
+B........BB,...B
+B...F.g....,...T
+BBTTBBTBT..,.TTT
+TTTBTTBBT..,.BTT

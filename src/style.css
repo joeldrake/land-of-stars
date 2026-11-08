@@ -65,58 +65,9 @@ body.standalone #splash { display: flex; }
 #dialog.done #dialog-next { opacity: 1; animation: blink .8s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* ---- touch controls ---- */
-.pad { display: none; }
-body.touch #app {
-  grid-template-areas: "stage stage" "left right";
-  grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr;
-}
-body.touch .pad { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 0; }
-#pad-left { grid-area: left; }
-#pad-right { grid-area: right; }
-@media (orientation: landscape) {
-  body.touch #app {
-    grid-template-areas: "left stage right";
-    grid-template-columns: 1fr auto 1fr; grid-template-rows: 1fr;
-  }
-}
-
-#dpad {
-  --s: clamp(130px, 22vmax, 210px);
-  /* never wider than its column, and always square (it used to get squashed on phones in landscape) */
-  position: relative; width: min(var(--s), 92%); aspect-ratio: 1; flex-shrink: 0; touch-action: none;
-}
-#dpad .arm, #dpad .hub { position: absolute; background: #3a3a50; }
-#dpad .arm { width: 34%; height: 34%; border-radius: 8px; }
-#dpad .hub { left: 33%; top: 33%; width: 34%; height: 34%; }
-#dpad .up { left: 33%; top: 0; }
-#dpad .down { left: 33%; bottom: 0; }
-#dpad .left { left: 0; top: 33%; }
-#dpad .right { right: 0; top: 33%; }
-#dpad[data-dir="up"] .up, #dpad[data-dir="down"] .down,
-#dpad[data-dir="left"] .left, #dpad[data-dir="right"] .right { background: #6a6a90; }
-
-#buttons { position: relative; width: min(clamp(150px, 24vmax, 230px), 96%); aspect-ratio: 1.2; flex-shrink: 0; }
-@media (orientation: landscape) {
-  /* a bit smaller when the phone lies down: the columns beside the game are narrow */
-  #dpad { --s: clamp(96px, 15.5vmax, 160px); }
-  #buttons { width: min(clamp(110px, 17vmax, 175px), 96%); }
-}
-.round {
-  position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%;
-  border: 4px solid rgba(255,255,255,.25); color: #fff;
-  font-size: clamp(22px, 5vmin, 38px); font-weight: 900; touch-action: none;
-}
-.round.a { right: 0; top: 8%; background: #c8323c; }
-.round.b { left: 0; bottom: 8%; background: #3459c0; }
-.round.down { filter: brightness(1.4); transform: scale(.94); }
-.bag {
-  /* above the B button with a clear gap, so it isn't pressed by mistake */
-  position: absolute; left: 6%; top: -30%; width: 30%; aspect-ratio: 1; border-radius: 50%;
-  border: 3px solid rgba(255,255,255,.25); background: #5a4a2a; color: #fff;
-  font-size: clamp(16px, 3.6vmin, 28px); padding: 0; touch-action: none;
-}
-.bag.down { filter: brightness(1.4); transform: scale(.94); }
+/* No on-screen pad: on touch screens and with a mouse you play on the game screen itself
+   (hold to walk, swipe to slash, draw a circle to spin, double tap for B). See game/touch.ts. */
+#screen { touch-action: none; }
 
 /* ---- menus ---- */
 #overlay {

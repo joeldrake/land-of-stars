@@ -1,12 +1,13 @@
-// Overworld 10,5 - meadow
+// Overworld 10,5 - the frog pond (an island with a bridge)
+@npc 2,6 sign sign_lake
 TBTBBBBTTBBBTBTB
-B.............TT
-T...........T.TB
-B...T.........BB
-B...............
-B...g...........
-................
-.............BTT
+B...WWWWWWW...TT
+T..WWWh.$WWW..TB
+B..WWW...WWW..BB
+B...WWW=WWW.....
+B...g......,,,,,
+...........,....
+,,,,,,,,,,,,.BTT
 ........F.....BB
 BT...TTTTTBBTBTT
 BT...TTTBBBBBTTB

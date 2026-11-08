@@ -7,6 +7,6 @@ BT..............
 TT..............
 BB......F......T
 .........F.....T
-...............T
-BB..TTBTTBTTTBTT
-TT..TBTTTTTTTTBB
+,,,............T
+BB,.TTBTTBTTTBTT
+TT,.TBTTTTTTTTBB

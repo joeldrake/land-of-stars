@@ -157,6 +157,10 @@ const FAIRY = sym([
   '..wwookr', '...odddd', '..oddddd', '.odddDdd', '.odddddd', '..oooooo', '....ok..', '....oo..',
 ]);
 const CROWN = ['y..y..y', 'y.yyy.y', 'yyyyyyy', 'yryyyry', 'yyyyyyy'];
+const OWL = sym([
+  '........', '..oo....', '..obo...', '..obbooo', '..obbbbb', '.obwwwbb', '.obwewbb', '.obwwwbb',
+  '.obbbbby', '.obllbbb', '.obllllb', '.obllllb', '..obllll', '...obbbb', '...ooyoo', '........',
+]);
 const SHOVEL = ['..o', '..o', '..o', '..o', '..o', '..o', '..o', '.ooo', 'oggg', 'oggg', '.gg.'];
 
 // ---------------------------------------------------------------- items
@@ -236,6 +240,7 @@ function buildArt() {
       fisher: sprite(MAN, { o: '#1a1410', h: '#ffd34d', k: '#f2c8a0', e: '#1a1410', b: '#f2c8a0', d: '#3a6ab0' }),
       stargazer: sprite(WIZARD, { o: '#1a1030', h: '#4a3aa0', y: '#ffe14d', k: '#f2c8a0', e: '#1a1030', b: '#f0f0f0', d: '#6a4ac0' }),
       sign: sprite(SIGN, { o: '#4a2a10', w: '#c8964a', l: '#6a4520' }),
+      owl: sprite(OWL, { o: '#2a1a10', b: '#8a5a30', w: '#ffffff', e: '#1a1010', y: '#ffb030', l: '#e0c090' }),
       fairy: sprite(FAIRY, { o: '#4a2a5a', y: '#ffe680', k: '#f5d0b0', e: '#2a1a30', r: '#e0606e', d: '#ff9ad0', D: '#ffffff', w: '#c8f0ff' }),
       // friends who move in once a castle is won
       slimey: (() => {
