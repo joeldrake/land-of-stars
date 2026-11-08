@@ -577,7 +577,8 @@ export class Game {
     } else {
       const held = this.input.touch.walkTarget(performance.now());
       if (held) { this.walkTo = null; this.pendingTalk = null; }
-      const tgt = held ? { x: held.x, y: held.y - HUD_H } : this.walkTo;
+      const raw = held ? { x: held.x, y: held.y - HUD_H } : this.walkTo;
+      const tgt = raw && this.edgeAssist(raw);
       if (tgt) {
         const dx = tgt.x - (p.x + 8), dy = tgt.y - (p.y + 11);
         reach = Math.hypot(dx, dy);
@@ -618,6 +619,23 @@ export class Game {
     }
     this.checkDoor();
     this.checkEdges();
+  }
+
+  /**
+   * Tapping or holding close to an open screen edge means "go to the next screen": move the
+   * target just past the edge so she walks out. Only where the edge is open, and only in a
+   * narrow band, so it doesn't happen by mistake.
+   */
+  private edgeAssist(t: { x: number; y: number }) {
+    const ZONE = 14;
+    const open = (tx: number, ty: number) => !isSolid(this.room.tiles[clamp(ty, 0, ROWS - 1)][clamp(tx, 0, COLS - 1)]);
+    let { x, y } = t;
+    const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE);
+    if (x < ZONE && open(0, ty)) x = -TILE;
+    else if (x > ROOM_W - ZONE && open(COLS - 1, ty)) x = ROOM_W + TILE;
+    if (y < ZONE && open(tx, 0)) y = -TILE;
+    else if (y > ROOM_H - ZONE && open(tx, ROWS - 1)) y = ROOM_H + TILE;
+    return x === t.x && y === t.y ? t : { x, y };
   }
 
   // ------------------------------------------------------------------ touch / mouse gestures
@@ -1729,6 +1747,7 @@ export class Game {
 
   /** The white streak behind a swiping finger, like slicing fruit. */
   private drawTrails(g: CanvasRenderingContext2D) {
+    if (!this.save.items.sword) return; // no sword yet: nothing to swing
     const now = performance.now();
     g.save();
     g.lineCap = 'round';
