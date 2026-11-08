@@ -1,7 +1,7 @@
 import { COLS, HUD_H, RENDER_SCALE, ROOM_H, ROOM_W, ROWS, START, STEP, TILE, VIEW_H, VIEW_W } from '../config';
 import { hasText, t } from '../i18n';
 import type { Dialog } from '../ui/dialog';
-import { art, paintRoom, tileImage } from './art';
+import { art, paintRoom, tileImage, waterFrame } from './art';
 import { Guide } from './guide';
 import { drawHud, drawInventory, drawWorldMap, HUD_TAP, INV_COLS, INV_SLOTS, invSlotAt } from './hud';
 import { play } from './sfx';
@@ -1529,15 +1529,26 @@ export class Game {
     const [dx, dy] = DIR_VEC[s.dir];
     const camX = dx * ROOM_W * k, camY = dy * ROOM_H * k;
     g.drawImage(this.room.canvas, -camX, -camY);
+    this.drawWater(g, this.room, -camX, -camY);
     this.drawFlags(g, this.room, -camX, -camY);
     this.drawNpcs(g, this.room, -camX, -camY);
     g.drawImage(s.to.canvas, dx * ROOM_W - camX, dy * ROOM_H - camY);
+    this.drawWater(g, s.to, dx * ROOM_W - camX, dy * ROOM_H - camY);
     this.drawFlags(g, s.to, dx * ROOM_W - camX, dy * ROOM_H - camY);
     this.drawNpcs(g, s.to, dx * ROOM_W - camX, dy * ROOM_H - camY);
     const target = this.scrollTarget(s.dir);
     const wx = s.fromX + (dx * ROOM_W + target.x - s.fromX) * k;
     const wy = s.fromY + (dy * ROOM_H + target.y - s.fromY) * k;
     this.drawPlayer(g, wx - camX, wy - camY);
+  }
+
+  /** Gently flowing water: the waves slide sideways, each tile starting at its own spot. */
+  private drawWater(g: CanvasRenderingContext2D, room: RoomRT, ox: number, oy: number) {
+    const step = Math.floor(this.time * 4); // 4 pixels a second
+    room.tiles.forEach((row, ty) => row.forEach((ch, tx) => {
+      if (ch !== 'W' && ch !== '_') return;
+      g.drawImage(waterFrame(step + tx * 5 + ty * 3), Math.round(ox + tx * TILE), Math.round(oy + ty * TILE));
+    }));
   }
 
   /** A flag waves over every castle whose star (or wings) has been won. */
@@ -1556,6 +1567,7 @@ export class Game {
   private renderRoom(g: CanvasRenderingContext2D) {
     const r = this.room;
     g.drawImage(r.canvas, 0, 0);
+    this.drawWater(g, r, 0, 0);
     const blink = Math.floor(this.time * 10) % 2 === 0;
 
     if (r.slide) {

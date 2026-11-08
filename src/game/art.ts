@@ -583,6 +583,28 @@ function paintTile(g: G, kind: AreaKind, ch: string, variant: number, th: string
   }
 }
 
+/** Number of frames in the water animation: the waves slide one pixel per frame. */
+export const WATER_FRAMES = 16;
+const waterCache: Img[] = [];
+/** Water tile with its little waves moved `f` pixels to the right (wrapping around). */
+export function waterFrame(f: number): Img {
+  f = ((f % WATER_FRAMES) + WATER_FRAMES) % WATER_FRAMES;
+  let c = waterCache[f];
+  if (c) return c;
+  c = canvas(TILE, TILE);
+  const g = c.getContext('2d')!;
+  rect(g, 0, 0, 16, 16, C.water);
+  const px = (x: number, y: number, col: string) => rect(g, (x + f) % 16, y, 1, 1, col);
+  for (const [x, y] of [[2, 4], [9, 10], [11, 3]]) {
+    for (let i = 0; i < 2; i++) { px(x + i, y, C.waterL); px(x + 2 + i, y - 1, C.waterL); }
+  }
+  // now and then a tiny glint of light
+  if (f % 8 === 3) px(6, 13, '#e0f0ff');
+  if (f % 8 === 7) px(14, 7, '#e0f0ff');
+  waterCache[f] = c;
+  return c;
+}
+
 const tileCache = new Map<string, Img>();
 export function tileImage(kind: AreaKind, ch: string, variant = 0, th = ''): Img {
   const key = `${kind}:${th}:${ch}:${variant}`;
